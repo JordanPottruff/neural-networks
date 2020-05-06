@@ -5,6 +5,11 @@ plugins {
 group 'org.jordanpottruff'
 version '1.0-SNAPSHOT'
 
+dependencies {
+    // Java Graphics Math Library
+    compile files('lib/jgml.jar')
+}
+
 repositories {
     mavenCentral()
 }
