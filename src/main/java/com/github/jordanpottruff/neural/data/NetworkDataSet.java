@@ -1,4 +1,4 @@
-import com.github.jordanpottruff.jgml.VecN;
+package com.github.jordanpottruff.neural.data;
 
 import java.util.List;
 

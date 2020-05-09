@@ -1,3 +1,5 @@
+package com.github.jordanpottruff.neural.data;
+
 import com.github.jordanpottruff.jgml.VecN;
 
 /**

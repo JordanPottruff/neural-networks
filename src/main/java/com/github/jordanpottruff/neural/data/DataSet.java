@@ -1,3 +1,4 @@
+package com.github.jordanpottruff.neural.data;
 
 import java.util.*;
 
