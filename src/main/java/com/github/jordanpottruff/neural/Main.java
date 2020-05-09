@@ -1,3 +1,4 @@
+package com.github.jordanpottruff.neural;
 
 public class Main {
 
