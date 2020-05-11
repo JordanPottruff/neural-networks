@@ -1,9 +1,14 @@
 package com.github.jordanpottruff.neural;
 
+import com.github.jordanpottruff.jgml.VecN;
+import com.github.jordanpottruff.neural.data.DataSet;
+import com.github.jordanpottruff.neural.data.Observation;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Provides functionality for reading the Modified National Institute of Standards and Technology (MNIST) database of
@@ -69,6 +74,17 @@ public class MNISTReader {
     }
 
     /**
+     * Reads the MNIST files and returns a list of the image/label combinations as a DataSet.
+     *
+     * @return the DataSet of MNIST images.
+     */
+    public DataSet getImageDataSet() {
+        String[] classes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+        List<Observation> obs = getImages().stream().map(MNISTImage::toObservation).collect(Collectors.toList());
+        return new DataSet(obs, classes);
+    }
+
+    /**
      * Defines single images in the MNIST database.
      */
     public static class MNISTImage {
@@ -85,6 +101,28 @@ public class MNISTReader {
         public MNISTImage(List<Double> image, int label) {
             this.image = image;
             this.label = label;
+        }
+
+        /**
+         * Converts the MNIST image object to a vector representation.
+         *
+         * @return a VecN storing the pixel information of the image, going top-down, left-right.
+         */
+        public VecN toVecN() {
+            double[] imageArray = new double[image.size()];
+            for(int i=0; i<imageArray.length; i++) {
+                imageArray[i] = image.get(i);
+            }
+            return new VecN(imageArray);
+        }
+
+        /**
+         * Converts the MNIST image object to an Observation.
+         *
+         * @return an Observation storing the pixel information as the attributes and the label as the classifier.
+         */
+        public Observation toObservation() {
+            return new Observation(toVecN(), Integer.toString(label));
         }
 
         /**
