@@ -10,11 +10,13 @@ import java.util.List;
 public interface Network {
 
     /**
-     * Trains the neural network on the given data set.
+     * Trains the neural network on the given data set. A proportion of the training data (defined by
+     * validationProportion) is removed and used as a validation set to determine a stopping point.
      *
      * @param trainingSet the DataSet to train the network on.
+     * @param validationProportion the proportion of the training data to use as a validation set.
      */
-    void train(DataSet trainingSet);
+    void train(DataSet trainingSet, double validationProportion);
 
     /**
      * Tests the neural network on the given data set.
