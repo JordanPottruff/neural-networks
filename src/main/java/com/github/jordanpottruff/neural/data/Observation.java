@@ -25,6 +25,7 @@ public class Observation implements NetworkObservation {
     /**
      * @inheritDoc
      */
+    @Override
     public VecN getAttributes() {
         return attributes;
     }
@@ -32,6 +33,7 @@ public class Observation implements NetworkObservation {
     /**
      * @inheritDoc
      */
+    @Override
     public String getClassification() {
         return classification;
     }

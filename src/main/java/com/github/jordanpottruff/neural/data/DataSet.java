@@ -25,6 +25,7 @@ public class DataSet implements NetworkDataSet {
     /**
      * @inheritDoc
      */
+    @Override
     public int size() {
         return observations.size();
     }
@@ -32,6 +33,7 @@ public class DataSet implements NetworkDataSet {
     /**
      * @inheritDoc
      */
+    @Override
     public String[] getClasses() {
         String[] classesCopy = new String[this.classes.length];
         System.arraycopy(this.classes, 0, classesCopy, 0, this.classes.length);
@@ -41,6 +43,7 @@ public class DataSet implements NetworkDataSet {
     /**
      * @inheritDoc
      */
+    @Override
     public Observation getObservation(int i) {
         return observations.get(i);
     }
@@ -48,6 +51,7 @@ public class DataSet implements NetworkDataSet {
     /**
      * @inheritDoc
      */
+    @Override
     public List<Observation> getAllObservations() {
         return new ArrayList<>(observations);
     }
