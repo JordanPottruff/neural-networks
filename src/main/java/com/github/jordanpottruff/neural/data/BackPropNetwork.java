@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
  */
 public class BackPropNetwork implements Network {
 
-    private final int inputSize;
-    private final int[] hiddenSizes;
+    private final List<Integer> layerSizes;
     private final String[] classes;
     private final double learningRate;
     private final double momentum;
     private final List<MatMN> weights;
+    private final List<VecN> biases;
 
     /**
      * Creates a new back propagation neural network.
@@ -31,24 +31,25 @@ public class BackPropNetwork implements Network {
      * @param momentum the momentum for the back propagation algorithm.
      */
     public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, double learningRate, double momentum) {
-        this.inputSize = inputSize;
-        this.hiddenSizes = hiddenSizes;
+        this.layerSizes = createLayerSizes(inputSize, hiddenSizes, classes);
         this.classes = classes;
         this.learningRate = learningRate;
         this.momentum = momentum;
-        this.weights = this.generateRandomWeights(inputSize, hiddenSizes, classes);
+        this.weights = this.generateRandomWeights(this.layerSizes);
+        this.biases = this.generateRandomBiases(this.layerSizes);
     }
 
-    // Returns a list of random weight matrices that conforms to the specifications of the layer sizes.
-    private List<MatMN> generateRandomWeights(int inputSize, int[] hiddenSizes, String[] classes) {
-       // Create list of sizes for each layer of the network (including input and output).
+    private List<Integer> createLayerSizes(int inputSize, int[] hiddenSizes, String[] classes) {
         List<Integer> layerSizes = new ArrayList<>();
         layerSizes.add(inputSize);
         layerSizes.addAll(Arrays.stream(hiddenSizes).boxed().collect(Collectors.toList()));
         layerSizes.add(classes.length);
+        return layerSizes;
+    }
 
+    // Returns a list of random weight matrices that conform to the specifications of the layer sizes.
+    private List<MatMN> generateRandomWeights(List<Integer> layerSizes) {
         List<MatMN> randomWeights = new ArrayList<>();
-
         for(int i=1; i<layerSizes.size(); i++) {
             int rows = layerSizes.get(i);
             int cols = layerSizes.get(i-1);
@@ -67,6 +68,26 @@ public class BackPropNetwork implements Network {
             }
         }
         return new MatMN(values);
+    }
+
+    // Returns a list of random bias vectors that conform to the specifications of the layer sizes.
+    private List<VecN> generateRandomBiases(List<Integer> layerSizes) {
+        List<VecN> randomBiases = new ArrayList<>();
+        // No bias is added to the input layer, so we begin at i=1.
+        for(int i=1; i<layerSizes.size(); i++) {
+            randomBiases.add(randomVector(layerSizes.get(i)));
+        }
+        return randomBiases;
+    }
+
+    // Returns a single random vector of the given dimension.
+    private VecN randomVector(int dimension) {
+        Random random = new Random();
+        double[] values = new double[dimension];
+        for(int i=0; i<dimension; i++) {
+            values[i] = random.nextGaussian();
+        }
+        return new VecN(values);
     }
 
     /**
@@ -100,9 +121,15 @@ public class BackPropNetwork implements Network {
      */
     public String toString() {
         StringBuilder result = new StringBuilder();
+        result.append("Weights: ").append("\n");
         for(int i=0; i<weights.size(); i++) {
-            result.append("Layer: ").append(i).append("\n");
+            result.append("Layer ").append(i).append("\n");
             result.append(weights.get(i).toString()).append("\n");
+        }
+        result.append("Biases: ").append("\n");
+        for(int i=0; i<biases.size(); i++) {
+            result.append("Layer ").append(i+1).append("\n");
+            result.append(biases.get(i).toString()).append("\n");
         }
         return result.toString();
     }
