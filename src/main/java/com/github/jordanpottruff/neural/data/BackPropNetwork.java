@@ -94,7 +94,7 @@ public class BackPropNetwork implements Network {
      * @inheritDoc
      */
     @Override
-    public void train(DataSet trainingSet, double validationProportion) {
+    public void train(DataSet trainingSet, int miniBatchSize, double validationProportion) {
 
     }
 

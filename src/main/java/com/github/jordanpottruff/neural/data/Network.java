@@ -14,9 +14,10 @@ public interface Network {
      * validationProportion) is removed and used as a validation set to determine a stopping point.
      *
      * @param trainingSet the DataSet to train the network on.
+     * @param miniBatchSize the size of the mini-batches to be used in gradient descent.
      * @param validationProportion the proportion of the training data to use as a validation set.
      */
-    void train(DataSet trainingSet, double validationProportion);
+    void train(DataSet trainingSet, int miniBatchSize, double validationProportion);
 
     /**
      * Tests the neural network on the given data set.
