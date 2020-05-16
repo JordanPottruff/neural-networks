@@ -44,7 +44,15 @@ public class UtilTest {
         MatMN expected = new MatMN(new double[][]{  {-1, -2, -3},
                                                     {5, 10, 15},
                                                     {3.5, 7, 10.5}});
-        System.out.println(product);
         assertTrue(expected.equals(product, EPSILON));
+    }
+
+    @Test
+    public void testTransposeMultiply() {
+        VecN vec = new VecN(new double[]{1.0, 2.0});
+        MatMN mat = new MatMN(new double[][]{{1.0, 2.0}, {3.0, 4.0}, {5.0, 6.0}});
+        VecN result = Util.transposeMultiply(vec, mat);
+        VecN expected = new VecN(new double[]{5, 11, 17});
+        assertTrue(expected.equals(result, EPSILON));
     }
 }

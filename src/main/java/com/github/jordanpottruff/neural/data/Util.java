@@ -42,4 +42,14 @@ class Util {
         }
         return new MatMN(product);
     }
+
+    static VecN transposeMultiply(VecN vec, MatMN mat) {
+        double[] result = new double[mat.cols()];
+        for(int col=0; col<mat.cols(); col++) {
+            for(int row=0; row<vec.size(); row++) {
+                result[col] += vec.get(row) * mat.get(row, col);
+            }
+        }
+        return new VecN(result);
+    }
 }
