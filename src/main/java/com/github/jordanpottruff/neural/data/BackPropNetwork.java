@@ -2,6 +2,7 @@ package com.github.jordanpottruff.neural.data;
 
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.VecN;
+import javafx.util.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -97,20 +98,71 @@ public class BackPropNetwork implements Network {
      */
     @Override
     public void train(DataSet trainingSet, int miniBatchSize, double validationProportion) {
+        int numMiniBatches = (int) Math.ceil((float) trainingSet.size()/miniBatchSize);
+        for(int batch=0; batch<numMiniBatches; batch++) {
+            // Define the index range for the current mini-batch.
+            int startIndex = batch*miniBatchSize;
+            int stopIndex = Math.min((batch+1)*miniBatchSize, trainingSet.size());
+            for(int i=startIndex; i<stopIndex; i++) {
 
+            }
+        }
+    }
+
+    public Pair<MatMN[], VecN[]> calculateGradient(Observation obs) {
+        List<VecN> activations = getActivations(obs.getAttributes());
+        VecN expectedOutput = getExpectedOutput(obs.getClassification());
+
+        // Two gradients: one for weights, one for biases.
+        MatMN[] weightGradient = new MatMN[weights.size()];
+        VecN[] biasGradient = new VecN[biases.size()];
+
+        // Calculate gradient of output layer.
+        int outputLayerIndex = activations.size()-1;
+        VecN outputActivation = activations.get(outputLayerIndex);
+        VecN logisticPrime = Util.applyLogisticPrime(outputActivation);
+        VecN delta = Util.componentWiseMultiply(expectedOutput.subtract(outputActivation),logisticPrime).invert();
+
+        weightGradient[outputLayerIndex-1] = Util.outerProduct(delta, activations.get(outputLayerIndex-1));
+        biasGradient[outputLayerIndex-1] = delta;
+
+        // Calculate gradient of hidden layer(s).
+        for(int hiddenLayerIndex=outputLayerIndex-1; hiddenLayerIndex>0; hiddenLayerIndex-=1) {
+            VecN hiddenActivation = activations.get(hiddenLayerIndex);
+            logisticPrime = Util.applyLogisticPrime(hiddenActivation);
+            VecN deltaTimesWeight = Util.transposeMultiply(delta, weights.get(hiddenLayerIndex));
+            delta = Util.componentWiseMultiply(logisticPrime, deltaTimesWeight);
+
+            weightGradient[hiddenLayerIndex-1] = Util.outerProduct(delta, activations.get(hiddenLayerIndex-1));
+            biasGradient[hiddenLayerIndex-1] = delta;
+        }
+        return new Pair<>(weightGradient, biasGradient);
     }
 
     // Return the activations of each layer, excluding the input layer.
     List<VecN> getActivations(VecN attributes) {
         List<VecN> activations = new ArrayList<>();
-        VecN activation = attributes;
+        activations.add(attributes);
 
         for(int layer=0; layer<weights.size(); layer++) {
-            VecN input = weights.get(layer).multiply(activation).add(biases.get(layer));
-            activation = Util.applyLogistic(input);
-            activations.add(activation);
+            VecN input = weights.get(layer).multiply(activations.get(layer)).add(biases.get(layer));
+            activations.add(Util.applyLogistic(input));
         }
         return activations;
+    }
+
+    // Return a vector describing the expected output for the given classification.
+    VecN getExpectedOutput(String classification) {
+        double[] expected = new double[classes.length];
+        for(int i=0; i<classes.length; i++) {
+            // If the observation's class corresponds to the class at the current index, set the index in the returned
+            // vector equal to 1.
+            if(classification.equals(classes[i])) {
+                expected[i] = 1.0;
+                break;
+            }
+        }
+        return new VecN(expected);
     }
 
     /**
