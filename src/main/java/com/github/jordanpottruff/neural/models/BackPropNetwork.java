@@ -1,10 +1,15 @@
-package com.github.jordanpottruff.neural.data;
+package com.github.jordanpottruff.neural.models;
 
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.VecN;
 import com.github.jordanpottruff.neural.common.Pair;
+import com.github.jordanpottruff.neural.data.DataSet;
+import com.github.jordanpottruff.neural.data.Observation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -23,11 +28,11 @@ public class BackPropNetwork implements Network {
     /**
      * Creates a new back propagation neural network.
      *
-     * @param inputSize the number of nodes in the input layer.
-     * @param hiddenSizes the number of nodes in each hidden layer. Each value corresponds to successive layer sizes.
-     * @param classes the classifications an observation can receive.
+     * @param inputSize    the number of nodes in the input layer.
+     * @param hiddenSizes  the number of nodes in each hidden layer. Each value corresponds to successive layer sizes.
+     * @param classes      the classifications an observation can receive.
      * @param learningRate the learning rate for the back propagation algorithm.
-     * @param momentum the momentum for the back propagation algorithm.
+     * @param momentum     the momentum for the back propagation algorithm.
      */
     public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, double learningRate, double momentum) {
         this(new Random(), inputSize, hiddenSizes, classes, learningRate, momentum);
@@ -55,9 +60,9 @@ public class BackPropNetwork implements Network {
     // Returns a list of random weight matrices that conform to the specifications of the layer sizes.
     private List<MatMN> generateRandomWeights(List<Integer> layerSizes) {
         List<MatMN> randomWeights = new ArrayList<>();
-        for(int i=1; i<layerSizes.size(); i++) {
+        for (int i = 1; i < layerSizes.size(); i++) {
             int rows = layerSizes.get(i);
-            int cols = layerSizes.get(i-1);
+            int cols = layerSizes.get(i - 1);
             randomWeights.add(randomMatrix(rows, cols));
         }
         return randomWeights;
@@ -66,8 +71,8 @@ public class BackPropNetwork implements Network {
     // Returns a single random matrix of size rows x cols.
     private MatMN randomMatrix(int rows, int cols) {
         double[][] values = new double[cols][rows];
-        for(int c=0; c<cols; c++) {
-            for(int r=0; r<rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            for (int r = 0; r < rows; r++) {
                 values[c][r] = rand.nextGaussian();
             }
         }
@@ -78,7 +83,7 @@ public class BackPropNetwork implements Network {
     private List<VecN> generateRandomBiases(List<Integer> layerSizes) {
         List<VecN> randomBiases = new ArrayList<>();
         // No bias is added to the input layer, so we begin at i=1.
-        for(int i=1; i<layerSizes.size(); i++) {
+        for (int i = 1; i < layerSizes.size(); i++) {
             randomBiases.add(randomVector(layerSizes.get(i)));
         }
         return randomBiases;
@@ -87,7 +92,7 @@ public class BackPropNetwork implements Network {
     // Returns a single random vector of the given dimension.
     private VecN randomVector(int dimension) {
         double[] values = new double[dimension];
-        for(int i=0; i<dimension; i++) {
+        for (int i = 0; i < dimension; i++) {
             values[i] = rand.nextGaussian();
         }
         return new VecN(values);
@@ -98,12 +103,12 @@ public class BackPropNetwork implements Network {
      */
     @Override
     public void train(DataSet trainingSet, int miniBatchSize, double validationProportion) {
-        int numMiniBatches = (int) Math.ceil((float) trainingSet.size()/miniBatchSize);
-        for(int batch=0; batch<numMiniBatches; batch++) {
+        int numMiniBatches = (int) Math.ceil((float) trainingSet.size() / miniBatchSize);
+        for (int batch = 0; batch < numMiniBatches; batch++) {
             // Define the index range for the current mini-batch.
-            int startIndex = batch*miniBatchSize;
-            int stopIndex = Math.min((batch+1)*miniBatchSize, trainingSet.size());
-            for(int i=startIndex; i<stopIndex; i++) {
+            int startIndex = batch * miniBatchSize;
+            int stopIndex = Math.min((batch + 1) * miniBatchSize, trainingSet.size());
+            for (int i = startIndex; i < stopIndex; i++) {
 
             }
         }
@@ -118,23 +123,23 @@ public class BackPropNetwork implements Network {
         VecN[] biasGradient = new VecN[biases.size()];
 
         // Calculate gradient of output layer.
-        int outputLayerIndex = activations.size()-1;
+        int outputLayerIndex = activations.size() - 1;
         VecN outputActivation = activations.get(outputLayerIndex);
         VecN logisticPrime = Util.applyLogisticPrime(outputActivation);
-        VecN delta = Util.componentWiseMultiply(expectedOutput.subtract(outputActivation),logisticPrime).invert();
+        VecN delta = Util.componentWiseMultiply(expectedOutput.subtract(outputActivation), logisticPrime).invert();
 
-        weightGradient[outputLayerIndex-1] = Util.outerProduct(delta, activations.get(outputLayerIndex-1));
-        biasGradient[outputLayerIndex-1] = delta;
+        weightGradient[outputLayerIndex - 1] = Util.outerProduct(delta, activations.get(outputLayerIndex - 1));
+        biasGradient[outputLayerIndex - 1] = delta;
 
         // Calculate gradient of hidden layer(s).
-        for(int hiddenLayerIndex=outputLayerIndex-1; hiddenLayerIndex>0; hiddenLayerIndex-=1) {
+        for (int hiddenLayerIndex = outputLayerIndex - 1; hiddenLayerIndex > 0; hiddenLayerIndex -= 1) {
             VecN hiddenActivation = activations.get(hiddenLayerIndex);
             logisticPrime = Util.applyLogisticPrime(hiddenActivation);
             VecN deltaTimesWeight = Util.transposeMultiply(delta, weights.get(hiddenLayerIndex));
             delta = Util.componentWiseMultiply(logisticPrime, deltaTimesWeight);
 
-            weightGradient[hiddenLayerIndex-1] = Util.outerProduct(delta, activations.get(hiddenLayerIndex-1));
-            biasGradient[hiddenLayerIndex-1] = delta;
+            weightGradient[hiddenLayerIndex - 1] = Util.outerProduct(delta, activations.get(hiddenLayerIndex - 1));
+            biasGradient[hiddenLayerIndex - 1] = delta;
         }
         return new Pair<>(weightGradient, biasGradient);
     }
@@ -144,7 +149,7 @@ public class BackPropNetwork implements Network {
         List<VecN> activations = new ArrayList<>();
         activations.add(attributes);
 
-        for(int layer=0; layer<weights.size(); layer++) {
+        for (int layer = 0; layer < weights.size(); layer++) {
             VecN input = weights.get(layer).multiply(activations.get(layer)).add(biases.get(layer));
             activations.add(Util.applyLogistic(input));
         }
@@ -154,10 +159,10 @@ public class BackPropNetwork implements Network {
     // Return a vector describing the expected output for the given classification.
     VecN getExpectedOutput(String classification) {
         double[] expected = new double[classes.length];
-        for(int i=0; i<classes.length; i++) {
+        for (int i = 0; i < classes.length; i++) {
             // If the observation's class corresponds to the class at the current index, set the index in the returned
             // vector equal to 1.
-            if(classification.equals(classes[i])) {
+            if (classification.equals(classes[i])) {
                 expected[i] = 1.0;
                 break;
             }
@@ -189,13 +194,13 @@ public class BackPropNetwork implements Network {
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append("Weights: ").append("\n");
-        for(int i=0; i<weights.size(); i++) {
+        for (int i = 0; i < weights.size(); i++) {
             result.append("Layer ").append(i).append("\n");
             result.append(weights.get(i).toString()).append("\n");
         }
         result.append("Biases: ").append("\n");
-        for(int i=0; i<biases.size(); i++) {
-            result.append("Layer ").append(i+1).append("\n");
+        for (int i = 0; i < biases.size(); i++) {
+            result.append("Layer ").append(i + 1).append("\n");
             result.append(biases.get(i).toString()).append("\n");
         }
         return result.toString();

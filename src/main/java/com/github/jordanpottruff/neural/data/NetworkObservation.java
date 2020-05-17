@@ -10,13 +10,15 @@ public interface NetworkObservation {
 
     /**
      * Returns the attributes of the observation.
+     *
      * @return observations as a vector.
      */
-    public VecN getAttributes();
+    VecN getAttributes();
 
     /**
      * Returns the classification of the observation.
+     *
      * @return name of observation's class.
      */
-    public String getClassification();
+    String getClassification();
 }

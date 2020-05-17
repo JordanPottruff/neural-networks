@@ -1,9 +1,12 @@
-package com.github.jordanpottruff.neural.data;
+package com.github.jordanpottruff.neural.models;
 
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.Vec2;
 import com.github.jordanpottruff.jgml.VecN;
 import com.github.jordanpottruff.neural.common.Pair;
+import com.github.jordanpottruff.neural.data.Observation;
+import com.github.jordanpottruff.neural.data.RandomStub;
+import com.github.jordanpottruff.neural.models.BackPropNetwork;
 import org.junit.Test;
 
 import java.util.Arrays;

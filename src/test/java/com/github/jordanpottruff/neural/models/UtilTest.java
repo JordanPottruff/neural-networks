@@ -1,10 +1,9 @@
-package com.github.jordanpottruff.neural.data;
+package com.github.jordanpottruff.neural.models;
 
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.VecN;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UtilTest {

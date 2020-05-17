@@ -12,9 +12,9 @@ public interface NetworkDataSet {
      *
      * @return the number of observations in the data set.
      */
-    public int size();
+    int size();
 
-    public String[] getClasses();
+    String[] getClasses();
 
     /**
      * Returns the ith observation in the data set.
@@ -22,12 +22,12 @@ public interface NetworkDataSet {
      * @param i the index of the observation to be returned.
      * @return the observation at index i.
      */
-    public NetworkObservation getObservation(int i);
+    NetworkObservation getObservation(int i);
 
     /**
      * Returns a list of all the observations in the data set.
      *
      * @return the list of observations.
      */
-    public List<? extends NetworkObservation> getAllObservations();
+    List<? extends NetworkObservation> getAllObservations();
 }

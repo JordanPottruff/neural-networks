@@ -110,7 +110,7 @@ public class MNISTReader {
          */
         public VecN toVecN() {
             double[] imageArray = new double[image.size()];
-            for(int i=0; i<imageArray.length; i++) {
+            for (int i = 0; i < imageArray.length; i++) {
                 imageArray[i] = image.get(i);
             }
             return new VecN(imageArray);

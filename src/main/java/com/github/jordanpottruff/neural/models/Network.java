@@ -1,6 +1,8 @@
-package com.github.jordanpottruff.neural.data;
+package com.github.jordanpottruff.neural.models;
 
 import com.github.jordanpottruff.jgml.VecN;
+import com.github.jordanpottruff.neural.data.DataSet;
+import com.github.jordanpottruff.neural.data.Observation;
 
 import java.util.List;
 
@@ -13,8 +15,8 @@ public interface Network {
      * Trains the neural network on the given data set. A proportion of the training data (defined by
      * validationProportion) is removed and used as a validation set to determine a stopping point.
      *
-     * @param trainingSet the DataSet to train the network on.
-     * @param miniBatchSize the size of the mini-batches to be used in gradient descent.
+     * @param trainingSet          the DataSet to train the network on.
+     * @param miniBatchSize        the size of the mini-batches to be used in gradient descent.
      * @param validationProportion the proportion of the training data to use as a validation set.
      */
     void train(DataSet trainingSet, int miniBatchSize, double validationProportion);

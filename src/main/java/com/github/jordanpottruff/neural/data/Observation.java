@@ -14,7 +14,8 @@ public class Observation implements NetworkObservation {
 
     /**
      * Creates an observation.
-     * @param attributes a vector storing the attribute values for the observation.
+     *
+     * @param attributes     a vector storing the attribute values for the observation.
      * @param classification the classification name for the observation.
      */
     public Observation(VecN attributes, String classification) {

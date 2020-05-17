@@ -1,6 +1,8 @@
 package com.github.jordanpottruff.neural.data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Data sets are composed of a collection of observations and additional information about the classification of these
