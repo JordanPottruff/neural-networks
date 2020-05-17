@@ -66,7 +66,7 @@ public class BackPropNetworkTest {
 
     @Test
     public void testGetActivations() {
-        VecN attributes = new Vec2(1.0, 2.0);
+        VecN attributes = new VecN(new double[]{1.0, 2.0});
         List<VecN> actual = NET.getActivations(attributes);
         VecN expectedInput = new VecN(new double[]{1.0, 2.0});
         VecN expectedHidden = new VecN(new double[]{0.953, 0.731, 0.953});
