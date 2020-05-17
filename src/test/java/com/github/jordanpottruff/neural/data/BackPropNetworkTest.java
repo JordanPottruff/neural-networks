@@ -3,7 +3,7 @@ package com.github.jordanpottruff.neural.data;
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.Vec2;
 import com.github.jordanpottruff.jgml.VecN;
-import javafx.util.Pair;
+import com.github.jordanpottruff.neural.common.Pair;
 import org.junit.Test;
 
 import java.util.Arrays;

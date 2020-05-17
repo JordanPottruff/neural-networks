@@ -2,7 +2,7 @@ package com.github.jordanpottruff.neural.data;
 
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.VecN;
-import javafx.util.Pair;
+import com.github.jordanpottruff.neural.common.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
