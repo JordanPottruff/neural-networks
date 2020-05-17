@@ -1,5 +1,7 @@
 package com.github.jordanpottruff.neural.data;
 
+import com.github.jordanpottruff.neural.common.Pair;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -56,5 +58,24 @@ public class DataSet implements NetworkDataSet {
     @Override
     public List<Observation> getAllObservations() {
         return new ArrayList<>(observations);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public Pair<DataSet, DataSet> split(double percentage) {
+        int cutoff = (int) Math.ceil(size() * percentage - 1);
+        List<Observation> left = new ArrayList<>();
+        List<Observation> right = new ArrayList<>();
+
+        for(int i=0; i<size(); i++) {
+            if(i <= cutoff) {
+                left.add(getObservation(i));
+            } else {
+                right.add(getObservation(i));
+            }
+        }
+        return new Pair<>(new DataSet(left, classes), new DataSet(right, classes));
     }
 }

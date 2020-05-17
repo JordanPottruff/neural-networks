@@ -1,5 +1,7 @@
 package com.github.jordanpottruff.neural.data;
 
+import com.github.jordanpottruff.neural.common.Pair;
+
 import java.util.List;
 
 /**
@@ -30,4 +32,11 @@ public interface NetworkDataSet {
      * @return the list of observations.
      */
     List<? extends NetworkObservation> getAllObservations();
+
+    /**
+     * Splits the data in the current data set into two new data sets.
+     * @param percentage the percentage of data in the first returned data set (key of returned pair).
+     * @return a pair of data sets.
+     */
+    Pair<DataSet, DataSet> split(double percentage);
 }
