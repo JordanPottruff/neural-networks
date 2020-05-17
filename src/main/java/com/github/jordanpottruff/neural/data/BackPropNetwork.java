@@ -100,6 +100,19 @@ public class BackPropNetwork implements Network {
 
     }
 
+    // Return the activations of each layer, excluding the input layer.
+    List<VecN> getActivations(VecN attributes) {
+        List<VecN> activations = new ArrayList<>();
+        VecN activation = attributes;
+
+        for(int layer=0; layer<weights.size(); layer++) {
+            VecN input = weights.get(layer).multiply(activation).add(biases.get(layer));
+            activation = Util.applyLogistic(input);
+            activations.add(activation);
+        }
+        return activations;
+    }
+
     /**
      * @inheritDoc
      */
