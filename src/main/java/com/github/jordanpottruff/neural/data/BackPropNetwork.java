@@ -3,10 +3,7 @@ package com.github.jordanpottruff.neural.data;
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.VecN;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -14,12 +11,13 @@ import java.util.stream.Collectors;
  */
 public class BackPropNetwork implements Network {
 
-    private final List<Integer> layerSizes;
-    private final String[] classes;
-    private final double learningRate;
-    private final double momentum;
-    private final List<MatMN> weights;
-    private final List<VecN> biases;
+    final List<Integer> layerSizes;
+    final String[] classes;
+    final double learningRate;
+    final double momentum;
+    final List<MatMN> weights;
+    final List<VecN> biases;
+    final Random rand;
 
     /**
      * Creates a new back propagation neural network.
@@ -31,6 +29,12 @@ public class BackPropNetwork implements Network {
      * @param momentum the momentum for the back propagation algorithm.
      */
     public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, double learningRate, double momentum) {
+        this(new Random(), inputSize, hiddenSizes, classes, learningRate, momentum);
+    }
+
+    // Additional constructor that can be used for testing.
+    BackPropNetwork(Random rand, int inputSize, int[] hiddenSizes, String[] classes, double learningRate, double momentum) {
+        this.rand = rand;
         this.layerSizes = createLayerSizes(inputSize, hiddenSizes, classes);
         this.classes = classes;
         this.learningRate = learningRate;
@@ -60,11 +64,10 @@ public class BackPropNetwork implements Network {
 
     // Returns a single random matrix of size rows x cols.
     private MatMN randomMatrix(int rows, int cols) {
-        Random random = new Random();
         double[][] values = new double[cols][rows];
         for(int c=0; c<cols; c++) {
             for(int r=0; r<rows; r++) {
-                values[c][r] = random.nextGaussian();
+                values[c][r] = rand.nextGaussian();
             }
         }
         return new MatMN(values);
@@ -82,10 +85,9 @@ public class BackPropNetwork implements Network {
 
     // Returns a single random vector of the given dimension.
     private VecN randomVector(int dimension) {
-        Random random = new Random();
         double[] values = new double[dimension];
         for(int i=0; i<dimension; i++) {
-            values[i] = random.nextGaussian();
+            values[i] = rand.nextGaussian();
         }
         return new VecN(values);
     }
