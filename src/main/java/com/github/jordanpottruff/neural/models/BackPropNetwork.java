@@ -103,15 +103,10 @@ public class BackPropNetwork implements Network {
      */
     @Override
     public void train(DataSet trainingSet, int miniBatchSize, double validationProportion) {
-        int numMiniBatches = (int) Math.ceil((float) trainingSet.size() / miniBatchSize);
-        for (int batch = 0; batch < numMiniBatches; batch++) {
-            // Define the index range for the current mini-batch.
-            int startIndex = batch * miniBatchSize;
-            int stopIndex = Math.min((batch + 1) * miniBatchSize, trainingSet.size());
-            for (int i = startIndex; i < stopIndex; i++) {
-
-            }
-        }
+        // Split out validation data from the training data.
+        Pair<DataSet, DataSet> data = trainingSet.split(1 - validationProportion);
+        DataSet training = data.getKey();
+        DataSet validation = data.getValue();
     }
 
     public Pair<MatMN[], VecN[]> calculateGradient(Observation obs) {
