@@ -39,4 +39,10 @@ public interface NetworkDataSet {
      * @return a pair of data sets.
      */
     Pair<DataSet, DataSet> split(double percentage);
+
+    /**
+     * Shuffles the data.
+     */
+    void shuffle();
+
 }

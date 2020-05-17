@@ -4,6 +4,7 @@ import com.github.jordanpottruff.neural.common.Pair;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -77,5 +78,12 @@ public class DataSet implements NetworkDataSet {
             }
         }
         return new Pair<>(new DataSet(left, classes), new DataSet(right, classes));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void shuffle() {
+        Collections.shuffle(observations);
     }
 }
