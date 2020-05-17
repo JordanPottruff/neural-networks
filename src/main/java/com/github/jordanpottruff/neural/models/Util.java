@@ -2,6 +2,11 @@ package com.github.jordanpottruff.neural.models;
 
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.VecN;
+import com.github.jordanpottruff.neural.data.DataSet;
+import com.github.jordanpottruff.neural.data.Observation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class Util {
 
@@ -51,5 +56,21 @@ class Util {
             }
         }
         return new VecN(result);
+    }
+
+    static List<List<Observation>> getMiniBatches(DataSet dataSet, int miniBatchSize) {
+        List<List<Observation>> batches = new ArrayList<>();
+        List<Observation> currentBatch = new ArrayList<>();
+        for(int i=0; i<dataSet.size(); i++) {
+            currentBatch.add(dataSet.getObservation(i));
+            if((i+1)%miniBatchSize == 0) {
+                batches.add(currentBatch);
+                currentBatch = new ArrayList<>();
+            }
+        }
+        if(currentBatch.size() != 0) {
+            batches.add(currentBatch);
+        }
+        return batches;
     }
 }
