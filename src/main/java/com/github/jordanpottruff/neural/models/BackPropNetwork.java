@@ -178,13 +178,9 @@ public class BackPropNetwork implements Network {
      */
     @Override
     public String classify(VecN attributes) {
-        System.out.println(this);
         VecN output = getActivations(attributes).get(layerSizes.size()-1);
         int maxIndex = 0;
         for(int i=1; i<classes.length; i++) {
-            System.out.println(output.get(i));
-            System.out.println(output.get(maxIndex));
-            System.out.println();
             if(output.get(i) > output.get(maxIndex)) {
                 maxIndex = i;
             }
