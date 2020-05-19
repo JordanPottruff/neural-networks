@@ -169,8 +169,38 @@ public class BackPropNetwork implements Network {
      * @inheritDoc
      */
     @Override
-    public BackPropResult test(DataSet testingSet) {
-        return null;
+    public Result test(DataSet testingSet) {
+        // Declare metadata about the test.
+        double error = 0;
+        int correctCount = 0;
+        List<Observation> correct = new ArrayList<>();
+        List<Observation> incorrect = new ArrayList<>();
+        // Iterate across all observations in the testing set.
+        for(Observation obs: testingSet.getAllObservations()) {
+            // Get activations for the observation and classify according to the current network.
+            List<VecN> activations = getActivations(obs.getAttributes());
+            String classification = classify(obs.getAttributes(), activations);
+            // Evaluate accuracy.
+            if(classification.equals(obs.getClassification())) {
+                correctCount++;
+                correct.add(obs);
+            } else {
+                incorrect.add(obs);
+            }
+            // Evaluate error.
+            VecN expectedOutput = getExpectedOutput(obs.getClassification());
+            VecN actualOutput = activations.get(activations.size()-1);
+            error += getError(expectedOutput, actualOutput);
+        }
+        // Calculate and encapsulate final testing metadata into a result.
+        double accuracy = (double) correctCount / testingSet.size();
+        double avgError = error / testingSet.size();
+        return new Result(accuracy, avgError, correct, incorrect);
+    }
+
+    private double getError(VecN expected, VecN actual) {
+        VecN diff = expected.subtract(actual);
+        return 0.5*diff.dot(diff);
     }
 
     /**
@@ -178,6 +208,11 @@ public class BackPropNetwork implements Network {
      */
     @Override
     public String classify(VecN attributes) {
+        return classify(attributes, getActivations(attributes));
+    }
+
+    // Computes class based on given activations; allows for caching of activation calculations.
+    private String classify(VecN attributes, List<VecN> activations) {
         VecN output = getActivations(attributes).get(layerSizes.size()-1);
         int maxIndex = 0;
         for(int i=1; i<classes.length; i++) {
@@ -211,7 +246,7 @@ public class BackPropNetwork implements Network {
     /**
      * The results of testing a back propagation neural network.
      */
-    public static class BackPropResult implements Network.TestResult {
+    public static class Result implements Network.TestResult {
 
         private final double accuracy;
         private final double error;
@@ -219,7 +254,7 @@ public class BackPropNetwork implements Network {
         private final List<Observation> incorrect;
 
         // Compiles the data to create a result of a test on a back prop network.
-        private BackPropResult(double accuracy, double error, List<Observation> correct, List<Observation> incorrect) {
+        private Result(double accuracy, double error, List<Observation> correct, List<Observation> incorrect) {
             this.accuracy = accuracy;
             this.error = error;
             this.correct = correct;

@@ -4,6 +4,7 @@ import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.Vec2;
 import com.github.jordanpottruff.jgml.VecN;
 import com.github.jordanpottruff.neural.common.Pair;
+import com.github.jordanpottruff.neural.data.DataSet;
 import com.github.jordanpottruff.neural.data.Observation;
 import com.github.jordanpottruff.neural.data.RandomStub;
 import org.junit.Test;
@@ -11,8 +12,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.junit.Assert.*;
 
 public class BackPropNetworkTest {
 
@@ -96,5 +97,18 @@ public class BackPropNetworkTest {
 
         assertEquals("B", classification1);
         assertEquals("A", classification2); // Technically a tie between A and C, but the first is taken.
+    }
+
+    @Test
+    public void testTest() {
+        Observation obs1 = new Observation(new Vec2(1, 10), "B");
+        Observation obs2 = new Observation(new Vec2(1000, -1000), "C");
+        DataSet data = new DataSet(Arrays.asList(obs1, obs2), new String[]{"A", "B", "C"});
+
+        BackPropNetwork.Result result = NET_2.test(data);
+        assertEquals(0.5, result.getAccuracy(), 0.01);
+        assertEquals(0.385, result.getError(), 0.01);
+        assertThat(result.correct(), hasItem(obs1));
+        assertThat(result.incorrect(), hasItem(obs2));
     }
 }
