@@ -8,6 +8,8 @@ version '1.0-SNAPSHOT'
 dependencies {
     // Java Graphics Math Library
     compile files('lib/jgml.jar')
+    // JSON Simple library
+    compile files('lib/json-simple-1.1.1.jar')
 }
 
 repositories {

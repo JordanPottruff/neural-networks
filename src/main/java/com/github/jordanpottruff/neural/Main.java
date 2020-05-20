@@ -1,15 +1,7 @@
 package com.github.jordanpottruff.neural;
 
-import com.github.jordanpottruff.jgml.Vec2;
-import com.github.jordanpottruff.neural.common.Pair;
 import com.github.jordanpottruff.neural.data.DataSet;
-import com.github.jordanpottruff.neural.data.Observation;
 import com.github.jordanpottruff.neural.models.BackPropNetwork;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class Main {
 
@@ -30,17 +22,17 @@ public class Main {
         BackPropNetwork network = new BackPropNetwork(inputSize, hiddenSizes, classes);
 
         int n = testData.size();
-        for(int i=0; i<50; i++) {
+        for (int i = 0; i < 50; i++) {
             network.train(trainData, 16, 1);
             BackPropNetwork.Result testResult = network.test(testData);
             int numCorrect = testResult.correct().size();
-            double accuracy = testResult.getAccuracy()*100;
+            double accuracy = testResult.getAccuracy() * 100;
 
             System.out.println(String.format("Epoch %d: %d/%d = %.2f%%", i, numCorrect, n, accuracy));
         }
         BackPropNetwork.Result testResult = network.test(testData);
         int numCorrect = testResult.correct().size();
-        double accuracy = testResult.getAccuracy()*100;
+        double accuracy = testResult.getAccuracy() * 100;
         System.out.println(String.format("Final:  %d/%d = %.2f%%", numCorrect, n, accuracy));
     }
 }
