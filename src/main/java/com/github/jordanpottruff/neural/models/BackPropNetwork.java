@@ -19,8 +19,6 @@ public class BackPropNetwork implements Network {
 
     final List<Integer> layerSizes;
     final String[] classes;
-    final double learningRate;
-    final double momentum;
     final List<MatMN> weights;
     final List<VecN> biases;
     final Random rand;
@@ -31,20 +29,16 @@ public class BackPropNetwork implements Network {
      * @param inputSize    the number of nodes in the input layer.
      * @param hiddenSizes  the number of nodes in each hidden layer. Each value corresponds to successive layer sizes.
      * @param classes      the classifications an observation can receive.
-     * @param learningRate the learning rate for the back propagation algorithm.
-     * @param momentum     the momentum for the back propagation algorithm.
      */
-    public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, double learningRate, double momentum) {
-        this(new Random(), inputSize, hiddenSizes, classes, learningRate, momentum);
+    public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes) {
+        this(new Random(), inputSize, hiddenSizes, classes);
     }
 
     // Additional constructor that can be used for testing.
-    BackPropNetwork(Random rand, int inputSize, int[] hiddenSizes, String[] classes, double learningRate, double momentum) {
+    BackPropNetwork(Random rand, int inputSize, int[] hiddenSizes, String[] classes) {
         this.rand = rand;
         this.layerSizes = createLayerSizes(inputSize, hiddenSizes, classes);
         this.classes = classes;
-        this.learningRate = learningRate;
-        this.momentum = momentum;
         this.weights = this.generateRandomWeights(this.layerSizes);
         this.biases = this.generateRandomBiases(this.layerSizes);
     }
@@ -102,11 +96,51 @@ public class BackPropNetwork implements Network {
      * @inheritDoc
      */
     @Override
-    public void train(DataSet trainingSet, int miniBatchSize, double validationProportion) {
-        // Split out validation data from the training data.
-        Pair<DataSet, DataSet> data = trainingSet.split(1 - validationProportion);
-        DataSet training = data.getKey();
-        DataSet validation = data.getValue();
+    public void train(DataSet trainingSet, int miniBatchSize, double learningRate) {
+        // Shuffle training set and split into mini batches.
+        trainingSet.shuffle();
+        List<List<Observation>> miniBatches = Util.getMiniBatches(trainingSet, miniBatchSize);
+
+        // Perform gradient descent on each mini batch.
+        for(List<Observation> batch: miniBatches) {
+            // Perform gradient descent on each observation in the mini batch.
+            MatMN[] deltaWeightBatch = new MatMN[weights.size()];
+            VecN[] deltaBiasBatch = new VecN[biases.size()];
+            for(Observation obs: batch) {
+                // Calculate gradients for the observation.
+                Pair<MatMN[], VecN[]> gradient = calculateGradient(obs);
+                MatMN[] weightGradient = gradient.getKey();
+                VecN[] biasGradient = gradient.getValue();
+                // Calculate observation's delta weight and add to mini-batch delta weight.
+                for(int w=0; w<weights.size(); w++) {
+                    MatMN deltaWeight = weightGradient[w].scale(learningRate).invert();
+                    if(deltaWeightBatch[w] == null) {
+                        deltaWeightBatch[w] = deltaWeight;
+                    } else {
+                        deltaWeightBatch[w] = deltaWeightBatch[w].add(deltaWeight.scale(1.0/batch.size()));
+                    }
+                }
+                // Calculate observation's delta bias and add to mini-batch delta bias.
+                for(int b=0; b<biases.size(); b++) {
+                    VecN deltaBias = biasGradient[b].scale(learningRate).invert();
+                    if(deltaBiasBatch[b] == null) {
+                        deltaBiasBatch[b] = deltaBias;
+                    } else {
+                        deltaBiasBatch[b] = deltaBiasBatch[b].add(deltaBias.scale(1.0/batch.size()));
+                    }
+                }
+            }
+
+            // Update weight matrices with batch deltas.
+            for(int w=0; w<weights.size(); w++) {
+                weights.set(w, weights.get(w).add(deltaWeightBatch[w]));
+            }
+
+            // Update bias vectors with batch deltas.
+            for(int b=0; b<biases.size(); b++) {
+                biases.set(b, biases.get(b).add(deltaBiasBatch[b]));
+            }
+        }
     }
 
     public Pair<MatMN[], VecN[]> calculateGradient(Observation obs) {

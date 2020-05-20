@@ -12,14 +12,14 @@ import java.util.List;
 public interface Network {
 
     /**
-     * Trains the neural network on the given data set. A proportion of the training data (defined by
-     * validationProportion) is removed and used as a validation set to determine a stopping point.
+     * Trains the neural network on the given training data set by separating the data into a series of mini-batches
+     * and performing gradient descent on each. This can be thought of as a single training epoch.
      *
-     * @param trainingSet          the DataSet to train the network on.
-     * @param miniBatchSize        the size of the mini-batches to be used in gradient descent.
-     * @param validationProportion the proportion of the training data to use as a validation set.
+     * @param trainingSet   the DataSet to train the network on.
+     * @param miniBatchSize the size of the mini-batches to be used in gradient descent.
+     * @param learningRate  the learning rate for the epoch.
      */
-    void train(DataSet trainingSet, int miniBatchSize, double validationProportion);
+    void train(DataSet trainingSet, int miniBatchSize, double learningRate);
 
     /**
      * Tests the neural network on the given data set.

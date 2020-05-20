@@ -21,8 +21,8 @@ public class BackPropNetworkTest {
 
     private static final RandomStub RAND_1 = new RandomStub(Arrays.asList(0.0, 1.0));
     private static final RandomStub RAND_2 = new RandomStub(Arrays.asList(0.0, 0.25));
-    private static final BackPropNetwork NET_1 = new BackPropNetwork(RAND_1, 2, new int[]{3}, new String[]{"A","B","C"}, 1.0, 1.0);
-    private static final BackPropNetwork NET_2 = new BackPropNetwork(RAND_2, 2, new int[]{3}, new String[]{"A","B","C"}, 1.0, 1.0);
+    private static final BackPropNetwork NET_1 = new BackPropNetwork(RAND_1, 2, new int[]{3}, new String[]{"A","B","C"});
+    private static final BackPropNetwork NET_2 = new BackPropNetwork(RAND_2, 2, new int[]{3}, new String[]{"A","B","C"});
 
     @Test
     public void testGenerateRandomWeights() {
