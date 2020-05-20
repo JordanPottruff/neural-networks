@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MNIST Neural Net</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="container">
+        <div id="controls">
+            <div class="slider-box control-box">
+                <h3 class="slider-title">Pen Strength</h3>
+                <input type="number" min="0.1" max="2" step="0.1" value="1" class="slider" id="in-strength" oninput="changePenStrength(this.value)">
+                <p class="slider-desc">Determines how quickly a pixel becomes darker when drawn on by the pen.</p>
+            </div>
+            <div class="slider-box control-box">
+                <h3 class="slider-title">Pen Radius</h3>
+                <input type="number" min="1" max="5" step="0.1" value="3" class="slider" id="in-radius" oninput="changePenRadius(this.value)">
+                <p class="slider-desc">Determines the number of pixels the pen's tip can cover.</p>
+            </div>
+            <div class="slider-box control-box">
+                <h3 class="slider-title">Pen Fade</h3>
+                <input type="number" min="1" max="5" step="0.1" value="2.5" class="slider" id="in-fade" oninput="changePenFade(this.value)">
+                <p class="slider-desc">Determines how much the pen fades out away from the center.</p>
+            </div>
+            <div id="buttons" class="control-box">
+                <button id="button-clear" type="button" onclick="clearGrid()">Clear</button>
+                <button id="button-submit" type="button">Submit</button>
+            </div>
+        </div>
+        <div id="canvas">
+            <!-- Sketch goes here -->
+        </div>
+    </div>
+</body>
+</html>
