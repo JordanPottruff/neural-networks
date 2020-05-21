@@ -26,6 +26,11 @@ function setup() {
     let canvas = createCanvas(SIZE,SIZE);
     canvas.parent("canvas");
 
+    canvas.addEventListener("touchstart", function(event) {event.preventDefault()});
+    canvas.addEventListener("touchmove", function(event) {event.preventDefault()});
+    canvas.addEventListener("touchend", function(event) {event.preventDefault()});
+    canvas.addEventListener("touchcancel", function(event) {event.preventDefault()});
+
     let mat = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
 }
 
