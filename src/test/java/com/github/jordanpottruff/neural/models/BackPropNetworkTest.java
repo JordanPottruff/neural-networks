@@ -25,7 +25,7 @@ public class BackPropNetworkTest {
     private static final BackPropNetwork NET_2 = new BackPropNetwork(RAND_2, 2, new int[]{3}, new String[]{"A","B","C"});
 
     @Test
-    public void testGenerateRandomWeights() {
+    public void testGenerateWeights() {
         MatMN expectedWeights1 = new MatMN(new double[][]{{0.0, 1.0, 0.0}, {1.0, 0.0, 1.0}});
         MatMN expectedWeights2 = new  MatMN(new double[][]{{0.0, 1.0, 0.0},{1.0, 0.0, 1.0},{0.0,1.0,0.0}});
 
@@ -35,9 +35,9 @@ public class BackPropNetworkTest {
     }
 
     @Test
-    public void testGenerateRandomBiases() {
-        VecN expectedBiases1 = new VecN(new double[]{1.0, 0.0, 1.0});
-        VecN expectedBiases2 = new VecN(new double[]{0.0, 1.0, 0.0});
+    public void testGenerateBiases() {
+        VecN expectedBiases1 = new VecN(new double[]{0.0, 0.0, 0.0});
+        VecN expectedBiases2 = new VecN(new double[]{0.0, 0.0, 0.0});
 
         assertTrue(expectedBiases1.equals(NET_1.biases.get(0), EPSILON));
         assertTrue(expectedBiases2.equals(NET_1.biases.get(1), EPSILON));
@@ -49,17 +49,17 @@ public class BackPropNetworkTest {
         Observation obs = new Observation(new Vec2(1.0, 2.0), "A");
         Pair<MatMN[], VecN[]> actual = NET_1.calculateGradient(obs);
 
-        VecN expectedBiasesOutput = new VecN(new double[]{-0.071, 0.046, 0.148});
+        VecN expectedBiasesOutput = new VecN(new double[]{-0.071284, 0.106763, 0.148077});
         MatMN expectedWeightsOutput = new MatMN(new double[][]{
-                {-0.068, 0.044, 0.141},
-                {-0.052, 0.034, 0.108},
-                {-0.068, 0.044, 0.141}
+                {-0.062787, 0.094037, 0.130426},
+                {-0.052113, 0.078050, 0.108253},
+                {-0.062787, 0.094037, 0.130426}
         });
 
-        VecN expectedBiasesHidden = new VecN(new double[]{0.002, 0.015, 0.002});
+        VecN expectedBiasesHidden = new VecN(new double[]{0.011209, 0.015098, 0.011209});
         MatMN expectedWeightsHidden = new MatMN(new double[][]{
-                {0.002, 0.015, 0.002},
-                {0.004, 0.03, 0.004}
+                {0.011209, 0.015098, 0.011209},
+                {0.022419, 0.030197, 0.022419}
         });
 
         assertTrue(expectedBiasesOutput.equals(actual.getValue()[1], EPSILON));
@@ -74,8 +74,8 @@ public class BackPropNetworkTest {
         VecN attributes = new VecN(new double[]{1.0, 2.0});
         List<VecN> actual = NET_1.getActivations(attributes);
         VecN expectedInput = new VecN(new double[]{1.0, 2.0});
-        VecN expectedHidden = new VecN(new double[]{0.953, 0.731, 0.953});
-        VecN expectedOutput = new VecN(new double[]{0.675, 0.948, 0.675});
+        VecN expectedHidden = new VecN(new double[]{0.880797, 0.731059, 0.880797});
+        VecN expectedOutput = new VecN(new double[]{0.675038, 0.853409, 0.675038});
 
         assertTrue(expectedInput.equals(actual.get(0), EPSILON));
         assertTrue(expectedHidden.equals(actual.get(1), EPSILON));
@@ -107,7 +107,7 @@ public class BackPropNetworkTest {
 
         BackPropNetwork.Result result = NET_2.test(data);
         assertEquals(0.5, result.getAccuracy(), 0.01);
-        assertEquals(0.385, result.getError(), 0.01);
+        assertEquals(0.37, result.getError(), 0.01);
         assertThat(result.correct(), hasItem(obs1));
         assertThat(result.incorrect(), hasItem(obs2));
     }

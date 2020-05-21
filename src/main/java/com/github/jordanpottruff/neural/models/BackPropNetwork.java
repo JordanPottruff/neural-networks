@@ -38,8 +38,8 @@ public class BackPropNetwork implements Network {
         this.rand = rand;
         this.layerSizes = createLayerSizes(inputSize, hiddenSizes, classes);
         this.classes = classes;
-        this.weights = this.generateRandomWeights(this.layerSizes);
-        this.biases = this.generateRandomBiases(this.layerSizes);
+        this.weights = this.generateWeights(this.layerSizes);
+        this.biases = this.generateBiases(this.layerSizes);
     }
 
     private List<Integer> createLayerSizes(int inputSize, int[] hiddenSizes, String[] classes) {
@@ -51,7 +51,7 @@ public class BackPropNetwork implements Network {
     }
 
     // Returns a list of random weight matrices that conform to the specifications of the layer sizes.
-    private List<MatMN> generateRandomWeights(List<Integer> layerSizes) {
+    private List<MatMN> generateWeights(List<Integer> layerSizes) {
         List<MatMN> randomWeights = new ArrayList<>();
         for (int i = 1; i < layerSizes.size(); i++) {
             int rows = layerSizes.get(i);
@@ -73,22 +73,13 @@ public class BackPropNetwork implements Network {
     }
 
     // Returns a list of random bias vectors that conform to the specifications of the layer sizes.
-    private List<VecN> generateRandomBiases(List<Integer> layerSizes) {
+    private List<VecN> generateBiases(List<Integer> layerSizes) {
         List<VecN> randomBiases = new ArrayList<>();
         // No bias is added to the input layer, so we begin at i=1.
         for (int i = 1; i < layerSizes.size(); i++) {
-            randomBiases.add(randomVector(layerSizes.get(i)));
+            randomBiases.add(new VecN(new double[layerSizes.get(i)]));
         }
         return randomBiases;
-    }
-
-    // Returns a single random vector of the given dimension.
-    private VecN randomVector(int dimension) {
-        double[] values = new double[dimension];
-        for (int i = 0; i < dimension; i++) {
-            values[i] = rand.nextGaussian();
-        }
-        return new VecN(values);
     }
 
     /**
