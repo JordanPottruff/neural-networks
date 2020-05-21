@@ -8,7 +8,10 @@ import com.github.jordanpottruff.neural.data.Observation;
 import com.github.jordanpottruff.neural.initializers.Initializer;
 import org.json.simple.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,29 +24,37 @@ public class BackPropNetwork implements Network {
     final String[] classes;
     final List<MatMN> weights;
     final List<VecN> biases;
-    final Function<VecN, VecN> activationFunc;
-    final Function<VecN, VecN> activationPrime;
+    final Function<VecN, VecN> hiddenActFunc;
+    final Function<VecN, VecN> hiddenActPrime;
+    final Function<VecN, VecN> outputActFunc;
+    final Function<VecN, VecN> outputActPrime;
     final Initializer init;
 
     /**
      * Creates a new back propagation neural network.
      *
-     * @param inputSize         the number of nodes in the input layer.
-     * @param hiddenSizes       the number of nodes in each hidden layer. Each value corresponds to successive layer
-     *                          sizes.
-     * @param classes           the classifications an observation can receive.
-     * @param activationFunc    the activation function for the network.
-     * @param activationPrime   the derivative of the activation function.
-     * @param init              the initializer for the network weights.
+     * @param inputSize      the number of nodes in the input layer.
+     * @param hiddenSizes    the number of nodes in each hidden layer. Each value corresponds to successive layer
+     *                       sizes.
+     * @param classes        the classifications an observation can receive.
+     * @param hiddenActFunc  the activation function for the hidden layers of the network.
+     * @param hiddenActPrime the derivative of the activation function for the hidden layers of the network.
+     * @param outputActFunc  the activation function for the output layer of the network.
+     * @param outputActPrime the derivative of the activation function for the output layer of the network.
+     * @param init           the initializer for the network weights.
      */
-    public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, Function<VecN, VecN> activationFunc, Function<VecN, VecN> activationPrime, Initializer init) {
+    public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, Function<VecN, VecN> hiddenActFunc,
+                           Function<VecN, VecN> hiddenActPrime, Function<VecN, VecN> outputActFunc, Function<VecN, VecN>
+                                   outputActPrime, Initializer init) {
         this.init = init;
         this.layerSizes = createLayerSizes(inputSize, hiddenSizes, classes);
         this.classes = classes;
         this.weights = this.generateWeights(this.layerSizes);
         this.biases = this.generateBiases(this.layerSizes);
-        this.activationFunc = activationFunc;
-        this.activationPrime = activationPrime;
+        this.hiddenActFunc = hiddenActFunc;
+        this.hiddenActPrime = hiddenActPrime;
+        this.outputActFunc = outputActFunc;
+        this.outputActPrime = outputActPrime;
     }
 
     private List<Integer> createLayerSizes(int inputSize, int[] hiddenSizes, String[] classes) {
@@ -60,7 +71,7 @@ public class BackPropNetwork implements Network {
         for (int i = 1; i < layerSizes.size(); i++) {
             int rows = layerSizes.get(i);
             int cols = layerSizes.get(i - 1);
-            randomWeights.add(randomMatrix(rows, cols, layerSizes.get(i-1)));
+            randomWeights.add(randomMatrix(rows, cols, layerSizes.get(i - 1)));
         }
         return randomWeights;
     }
@@ -149,7 +160,7 @@ public class BackPropNetwork implements Network {
         // Calculate gradient of output layer.
         int outputLayerIndex = activations.size() - 1;
         VecN outputActivation = activations.get(outputLayerIndex);
-        VecN logisticPrime = activationPrime.apply(outputActivation);
+        VecN logisticPrime = outputActPrime.apply(outputActivation);
         VecN delta = Util.componentWiseMultiply(expectedOutput.subtract(outputActivation), logisticPrime).invert();
 
         weightGradient[outputLayerIndex - 1] = Util.outerProduct(delta, activations.get(outputLayerIndex - 1));
@@ -158,7 +169,7 @@ public class BackPropNetwork implements Network {
         // Calculate gradient of hidden layer(s).
         for (int hiddenLayerIndex = outputLayerIndex - 1; hiddenLayerIndex > 0; hiddenLayerIndex -= 1) {
             VecN hiddenActivation = activations.get(hiddenLayerIndex);
-            logisticPrime = activationPrime.apply(hiddenActivation);
+            logisticPrime = hiddenActPrime.apply(hiddenActivation);
             VecN deltaTimesWeight = Util.transposeMultiply(delta, weights.get(hiddenLayerIndex));
             delta = Util.componentWiseMultiply(logisticPrime, deltaTimesWeight);
 
@@ -175,7 +186,13 @@ public class BackPropNetwork implements Network {
 
         for (int layer = 0; layer < weights.size(); layer++) {
             VecN input = weights.get(layer).multiply(activations.get(layer)).add(biases.get(layer));
-            activations.add(activationFunc.apply(input));
+            if (layer < weights.size() - 1) {
+                // Hidden layers
+                activations.add(hiddenActFunc.apply(input));
+            } else {
+                // Output layer
+                activations.add(outputActFunc.apply(input));
+            }
         }
         return activations;
     }

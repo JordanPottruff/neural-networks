@@ -1,15 +1,19 @@
 
 function classify(attributes) {
     console.log("classify");
-    weights = TRAINED3['weights']
-    biases = TRAINED3['biases']
+    weights = RELU['weights']
+    biases = RELU['biases']
 
     let output = attributes;
     for(let i=0; i<weights.length; i++) {
         weight = weights[i];
         bias = biases[i];
+        if(i < weights.length - 1) {
+            output = relu_func(add(multiply(weight, output), bias));
+        } else {
+            output = logistic_func(add(multiply(weight, output), bias));
+        }
 
-        output = logistic_func(add(multiply(weight, output), bias));
     }
     return output;
 }
@@ -68,6 +72,14 @@ function logistic_func(vec) {
     let result = new Array(vec.length).fill(0);
     for(let i=0; i<vec.length; i++) {
         result[i] = 1.0 / (1 + Math.exp(-vec[i]))
+    }
+    return result;
+}
+
+function relu_func(vec) {
+    let result = new Array(vec.length).fill(0);
+    for(let i=0; i<vec.length; i++) {
+        result[i] = Math.max(0.0, vec[i]);
     }
     return result;
 }
