@@ -27,7 +27,7 @@ public class Main {
         int inputSize = 784;
         int[] hiddenSizes = {64, 32};
         String[] classes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-        BackPropNetwork network = new BackPropNetwork(inputSize, hiddenSizes, classes, new ReLU(), new ReLU.Prime(), new Logistic(), new Logistic.Prime(), new HeInitializer());
+        BackPropNetwork network = new BackPropNetwork(inputSize, hiddenSizes, classes, new ReLU(), new Logistic(), new HeInitializer());
 
         int n = testData.size();
         double startLearningRate = 0.03;

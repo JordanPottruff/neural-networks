@@ -2,6 +2,7 @@ package com.github.jordanpottruff.neural.models;
 
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.VecN;
+import com.github.jordanpottruff.neural.activations.ActivationFunc;
 import com.github.jordanpottruff.neural.common.Pair;
 import com.github.jordanpottruff.neural.data.DataSet;
 import com.github.jordanpottruff.neural.data.Observation;
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -24,10 +24,8 @@ public class BackPropNetwork implements Network {
     final String[] classes;
     final List<MatMN> weights;
     final List<VecN> biases;
-    final Function<VecN, VecN> hiddenActFunc;
-    final Function<VecN, VecN> hiddenActPrime;
-    final Function<VecN, VecN> outputActFunc;
-    final Function<VecN, VecN> outputActPrime;
+    final ActivationFunc hiddenActFunc;
+    final ActivationFunc outputActFunc;
     final Initializer init;
 
     /**
@@ -38,23 +36,18 @@ public class BackPropNetwork implements Network {
      *                       sizes.
      * @param classes        the classifications an observation can receive.
      * @param hiddenActFunc  the activation function for the hidden layers of the network.
-     * @param hiddenActPrime the derivative of the activation function for the hidden layers of the network.
      * @param outputActFunc  the activation function for the output layer of the network.
-     * @param outputActPrime the derivative of the activation function for the output layer of the network.
      * @param init           the initializer for the network weights.
      */
-    public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, Function<VecN, VecN> hiddenActFunc,
-                           Function<VecN, VecN> hiddenActPrime, Function<VecN, VecN> outputActFunc, Function<VecN, VecN>
-                                   outputActPrime, Initializer init) {
+    public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, ActivationFunc hiddenActFunc,
+                           ActivationFunc outputActFunc, Initializer init) {
         this.init = init;
         this.layerSizes = createLayerSizes(inputSize, hiddenSizes, classes);
         this.classes = classes;
         this.weights = this.generateWeights(this.layerSizes);
         this.biases = this.generateBiases(this.layerSizes);
         this.hiddenActFunc = hiddenActFunc;
-        this.hiddenActPrime = hiddenActPrime;
         this.outputActFunc = outputActFunc;
-        this.outputActPrime = outputActPrime;
     }
 
     private List<Integer> createLayerSizes(int inputSize, int[] hiddenSizes, String[] classes) {
@@ -160,7 +153,7 @@ public class BackPropNetwork implements Network {
         // Calculate gradient of output layer.
         int outputLayerIndex = activations.size() - 1;
         VecN outputActivation = activations.get(outputLayerIndex);
-        VecN logisticPrime = outputActPrime.apply(outputActivation);
+        VecN logisticPrime = outputActFunc.applyPrime(outputActivation);
         VecN delta = Util.componentWiseMultiply(expectedOutput.subtract(outputActivation), logisticPrime).invert();
 
         weightGradient[outputLayerIndex - 1] = Util.outerProduct(delta, activations.get(outputLayerIndex - 1));
@@ -169,7 +162,7 @@ public class BackPropNetwork implements Network {
         // Calculate gradient of hidden layer(s).
         for (int hiddenLayerIndex = outputLayerIndex - 1; hiddenLayerIndex > 0; hiddenLayerIndex -= 1) {
             VecN hiddenActivation = activations.get(hiddenLayerIndex);
-            logisticPrime = hiddenActPrime.apply(hiddenActivation);
+            logisticPrime = hiddenActFunc.applyPrime(hiddenActivation);
             VecN deltaTimesWeight = Util.transposeMultiply(delta, weights.get(hiddenLayerIndex));
             delta = Util.componentWiseMultiply(logisticPrime, deltaTimesWeight);
 
@@ -188,10 +181,10 @@ public class BackPropNetwork implements Network {
             VecN input = weights.get(layer).multiply(activations.get(layer)).add(biases.get(layer));
             if (layer < weights.size() - 1) {
                 // Hidden layers
-                activations.add(hiddenActFunc.apply(input));
+                activations.add(hiddenActFunc.applyFunc(input));
             } else {
                 // Output layer
-                activations.add(outputActFunc.apply(input));
+                activations.add(outputActFunc.applyFunc(input));
             }
         }
         return activations;

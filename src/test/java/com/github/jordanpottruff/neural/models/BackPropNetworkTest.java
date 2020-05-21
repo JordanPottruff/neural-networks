@@ -21,8 +21,8 @@ public class BackPropNetworkTest {
 
     private static final InitializerStub INIT_1 = new InitializerStub(Arrays.asList(0.0, 1.0));
     private static final InitializerStub INIT_2 = new InitializerStub(Arrays.asList(0.0, 0.25));
-    private static final BackPropNetwork NET_1 = new BackPropNetwork(2, new int[]{3}, new String[]{"A", "B", "C"}, new Logistic(), new Logistic.Prime(), new Logistic(), new Logistic.Prime(), INIT_1);
-    private static final BackPropNetwork NET_2 = new BackPropNetwork(2, new int[]{3}, new String[]{"A", "B", "C"}, new Logistic(), new Logistic.Prime(), new Logistic(), new Logistic.Prime(), INIT_2);
+    private static final BackPropNetwork NET_1 = new BackPropNetwork(2, new int[]{3}, new String[]{"A", "B", "C"}, new Logistic(), new Logistic(), INIT_1);
+    private static final BackPropNetwork NET_2 = new BackPropNetwork(2, new int[]{3}, new String[]{"A", "B", "C"}, new Logistic(), new Logistic(), INIT_2);
 
     @Test
     public void testGenerateWeights() {
