@@ -10,6 +10,8 @@ var penFade;
 
 var grid = new Array(28*28);
 
+var popupOpen = false;
+var detailsOpen = false;
 
 
 function setup() {
@@ -23,12 +25,14 @@ function setup() {
     frameRate(30);
     let canvas = createCanvas(SIZE,SIZE);
     canvas.parent("canvas");
+
+    let mat = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
 }
 
 function draw() {
     background(250);
     drawGrid();
-    if(mouseIsPressed) {
+    if(mouseIsPressed && !popupOpen) {
         addDrawing(mouseX, mouseY);
     }
 }
@@ -43,12 +47,11 @@ function addDrawingGrid(gx, gy, cx, cy, visited) {
     if(gx > 27 || gx < 0 || gy > 27 || gy < 0) {
         return;
     }
-    index = gx*28 + gy
+    index = gy*28 + gx;
     if(visited.includes(index)) {
         return;
     }
     let dist = Math.sqrt(Math.pow(gx-cx, 2) + Math.pow(gy-cy, 2));
-    console.log(dist);
     if(dist >= penRadius) {
         return;
     }
@@ -73,8 +76,8 @@ function gridY(my) {
 function drawGrid() {
     let squareSize = SIZE/28;
     for(let i=0; i<grid.length; i++) {
-        let row = i%28;
-        let col = Math.floor(i/28);
+        let col = i%28;
+        let row = Math.floor(i/28);
 
         let x = col*squareSize;
         let y = row*squareSize;
@@ -91,6 +94,42 @@ function clearGrid() {
     }
 }
 
+function centerGrid() {
+    let lowCol = 28;
+    let highCol = 0;
+    let lowRow = 28;
+    let highRow = 0;
+
+
+    for(let i=0; i<grid.length; i++) {
+        let col = i%28;
+        let row = Math.floor(i/28);
+
+        if(grid[i] > 0.0001) {
+            lowCol = Math.min(lowCol, col);
+            highCol = Math.max(highCol, col);
+            lowRow = Math.min(lowRow, row);
+            highRow = Math.max(highRow, row);
+        }
+    }
+
+    let shiftDown = Math.floor((28 - (highRow - lowRow)) / 2) - (27-highRow);
+    let shiftLeft = Math.floor((28 - (highCol - lowCol)) / 2) - (27-highCol);
+
+    let newGrid = new Array(28*28).fill(0);
+    for(let i=0; i<grid.length; i++) {
+        let col = i%28;
+        let row = Math.floor(i/28);
+
+        let shiftedCol = Math.max(col - shiftLeft, 0);
+        let shiftedRow = Math.max(row - shiftDown, 0);
+
+        let shiftedI = shiftedRow * 28 + shiftedCol;
+        newGrid[shiftedI] = grid[i]
+    }
+    grid = newGrid;
+}
+
 function changePenStrength(value) {
     penStrength = value;
 }
@@ -101,4 +140,58 @@ function changePenRadius(value) {
 
 function changePenFade(value) {
     penFade = value;
+}
+
+function submit() {
+    centerGrid();
+    output = classify(grid);
+    document.getElementById("popup-guess").innerHTML = getGuess(output);
+    orderedOutput = orderGuesses(output);
+    let table = document.getElementById("prob-table");
+    for(let i=0; i<orderedOutput.length; i++) {
+        let dig = orderedOutput[i]["dig"];
+        let prob = orderedOutput[i]["prob"] * 100;
+
+        let id = "guess" + i;
+        let tableRow = document.getElementById(id);
+        tableRow.children[0].innerHTML = dig;
+        tableRow.children[1].innerHTML = prob.toFixed(2) + "%";
+    }
+    document.getElementById("overlay").style.display = "flex";
+
+    popupOpen = true;
+}
+
+function closePopup() {
+    document.getElementById("overlay").style.display = "none";
+    popupOpen = false;
+}
+
+function toggleDetails() {
+    if(detailsOpen) {
+        document.getElementById("probabilities").style.display = "none";
+    } else {
+        document.getElementById("probabilities").style.display = "flex";
+    }
+    detailsOpen = !detailsOpen;
+}
+
+function getGuess(output) {
+    let maxIndex = 0;
+    for(let i=1; i<output.length; i++) {
+        if(output[i] > output[maxIndex]) {
+            maxIndex = i;
+        }
+    }
+    return maxIndex;
+}
+
+function orderGuesses(output) {
+    let map = new Array(output.length);
+    for(let i=0; i<output.length; i++) {
+        map[i] = {"dig":i, "prob":output[i]};
+    }
+
+    map.sort((a, b) => (a["prob"] < b["prob"]) ? 1 : -1);
+    return map;
 }

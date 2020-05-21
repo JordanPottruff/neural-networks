@@ -4,19 +4,79 @@
     <title>MNIST Neural Net</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
     <script src="index.js"></script>
+    <script src="networks/backprop.js"></script>
+    <script src="networks/trained-networks.js"></script>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
+    <div id="overlay">
+        <div id="submission-popup">
+            <p id="popup-desc">The network thinks that you drew a...</p>
+            <h2 id="popup-guess"></h2>
+            <p id="popup-more" onclick="toggleDetails()">More details</p>
+            <div id="probabilities">
+                <table id="prob-table">
+                    <tr>
+                        <th>Digit</th>
+                        <th>Probability</th>
+                    </tr>
+                    <tr id="guess0">
+                        <td class="dig">0</td>
+                        <td class="prob" id="p0"></td>
+                    </tr>
+                    <tr id="guess1">
+                        <td class="dig">1</td>
+                        <td class="prob" id="p1"></td>
+                    </tr>
+                    <tr id="guess2">
+                        <td class="dig">2</td>
+                        <td class="prob" id="p2"></td>
+                    </tr>
+                    <tr id="guess3">
+                        <td class="dig">3</td>
+                        <td class="prob" id="p3"></td>
+                    </tr>
+                    <tr id="guess4">
+                        <td class="dig">4</td>
+                        <td class="prob" id="p4"></td>
+                    </tr>
+                    <tr id="guess5">
+                        <td class="dig">5</td>
+                        <td class="prob" id="p5"></td>
+                    </tr>
+                    <tr id="guess6">
+                        <td class="dig">6</td>
+                        <td class="prob" id="p6"></td>
+                    </tr>
+                    <tr id="guess7">
+                        <td class="dig">7</td>
+                        <td class="prob" id="p7"></td>
+                    </tr>
+                    <tr id="guess8">
+                        <td class="dig">8</td>
+                        <td class="prob" id="p8"></td>
+                    </tr>
+                    <tr id="guess9">
+                        <td class="dig">9</td>
+                        <td class="prob" id="p9"></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="popup-continue">
+                <button id="popup-close" type="button" onclick="closePopup()">Close</button>
+            </div>
+        </div>
+    </div>
     <div id="container">
         <div id="controls">
             <div class="slider-box control-box">
                 <h3 class="slider-title">Pen Strength</h3>
-                <input type="number" min="0.1" max="2" step="0.1" value="1" class="slider" id="in-strength" oninput="changePenStrength(this.value)">
+                <input type="number" min="0.1" max="2" step="0.1" value="1.0" class="slider" id="in-strength" oninput="changePenStrength(this.value)">
                 <p class="slider-desc">Determines how quickly a pixel becomes darker when drawn on by the pen.</p>
             </div>
             <div class="slider-box control-box">
                 <h3 class="slider-title">Pen Radius</h3>
-                <input type="number" min="1" max="5" step="0.1" value="3" class="slider" id="in-radius" oninput="changePenRadius(this.value)">
+                <input type="number" min="1" max="5" step="0.1" value="2.5" class="slider" id="in-radius" oninput="changePenRadius(this.value)">
                 <p class="slider-desc">Determines the number of pixels the pen's tip can cover.</p>
             </div>
             <div class="slider-box control-box">
@@ -26,7 +86,7 @@
             </div>
             <div id="buttons" class="control-box">
                 <button id="button-clear" type="button" onclick="clearGrid()">Clear</button>
-                <button id="button-submit" type="button">Submit</button>
+                <button id="button-submit" type="button" onclick="submit()">Submit</button>
             </div>
         </div>
         <div id="canvas">
