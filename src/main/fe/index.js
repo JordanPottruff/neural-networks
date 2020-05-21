@@ -130,7 +130,9 @@ function centerGrid() {
         let shiftedRow = Math.max(row - shiftDown, 0);
 
         let shiftedI = shiftedRow * 28 + shiftedCol;
-        newGrid[shiftedI] = grid[i]
+        if(shiftedI < 28*28 && shiftedI > 0) {
+            newGrid[shiftedI] = grid[i];
+        }
     }
     grid = newGrid;
 }

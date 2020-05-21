@@ -40,6 +40,9 @@ function dot(vec1, vec2) {
     let sum = 0;
     for(let i=0; i<vec1.length; i++) {
         sum += vec1[i] * vec2[i];
+        if(!isNaN(vec1[i]) && !isNaN(vec2[i]) && isNaN(sum)){
+            console.log(issue);
+        }
     }
     return sum;
 }
@@ -48,7 +51,14 @@ function multiply(mat, vec) {
     let result = new Array(mat[0].length).fill(0);
     for(let row=0; row<mat[0].length; row++) {
         for(let col=0; col<mat.length; col++) {
+            old_result = Number(result[row]);
             result[row] += mat[col][row] * vec[col];
+            if(!isNaN(mat[col][row]) && !isNaN(vec[col]) && isNaN(result[row])) {
+                console.log("issue");
+                console.log(mat[col][row]);
+                console.log(vec[col]);
+                console.log(old_result);
+            }
         }
     }
     return result;
@@ -72,6 +82,9 @@ function logistic_func(vec) {
     let result = new Array(vec.length).fill(0);
     for(let i=0; i<vec.length; i++) {
         result[i] = 1.0 / (1 + Math.exp(-vec[i]))
+        if(isNaN(vec[i]) && !isNaN(result[i])) {
+            console.log("issue");
+        }
     }
     return result;
 }
@@ -80,6 +93,9 @@ function relu_func(vec) {
     let result = new Array(vec.length).fill(0);
     for(let i=0; i<vec.length; i++) {
         result[i] = Math.max(0.0, vec[i]);
+        if(isNaN(vec[i]) && !isNaN(result[i])) {
+            console.log("issue");
+        }
     }
     return result;
 }
