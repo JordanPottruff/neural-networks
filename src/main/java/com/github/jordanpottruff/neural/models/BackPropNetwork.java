@@ -5,11 +5,11 @@ import com.github.jordanpottruff.jgml.VecN;
 import com.github.jordanpottruff.neural.common.Pair;
 import com.github.jordanpottruff.neural.data.DataSet;
 import com.github.jordanpottruff.neural.data.Observation;
+import org.json.simple.JSONObject;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.json.simple.JSONObject;
 
 /**
  * Creates basic neural networks that learn with back propagation.
@@ -25,9 +25,9 @@ public class BackPropNetwork implements Network {
     /**
      * Creates a new back propagation neural network.
      *
-     * @param inputSize    the number of nodes in the input layer.
-     * @param hiddenSizes  the number of nodes in each hidden layer. Each value corresponds to successive layer sizes.
-     * @param classes      the classifications an observation can receive.
+     * @param inputSize   the number of nodes in the input layer.
+     * @param hiddenSizes the number of nodes in each hidden layer. Each value corresponds to successive layer sizes.
+     * @param classes     the classifications an observation can receive.
      */
     public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes) {
         this(new Random(), inputSize, hiddenSizes, classes);
@@ -92,42 +92,42 @@ public class BackPropNetwork implements Network {
         List<List<Observation>> miniBatches = Util.getMiniBatches(trainingSet, miniBatchSize);
 
         // Perform gradient descent on each mini batch.
-        for(List<Observation> batch: miniBatches) {
+        for (List<Observation> batch : miniBatches) {
             // Perform gradient descent on each observation in the mini batch.
             MatMN[] deltaWeightBatch = new MatMN[weights.size()];
             VecN[] deltaBiasBatch = new VecN[biases.size()];
-            for(Observation obs: batch) {
+            for (Observation obs : batch) {
                 // Calculate gradients for the observation.
                 Pair<MatMN[], VecN[]> gradient = calculateGradient(obs);
                 MatMN[] weightGradient = gradient.getKey();
                 VecN[] biasGradient = gradient.getValue();
                 // Calculate observation's delta weight and add to mini-batch delta weight.
-                for(int w=0; w<weights.size(); w++) {
+                for (int w = 0; w < weights.size(); w++) {
                     MatMN deltaWeight = weightGradient[w].scale(learningRate).invert();
-                    if(deltaWeightBatch[w] == null) {
+                    if (deltaWeightBatch[w] == null) {
                         deltaWeightBatch[w] = deltaWeight;
                     } else {
-                        deltaWeightBatch[w] = deltaWeightBatch[w].add(deltaWeight.scale(1.0/batch.size()));
+                        deltaWeightBatch[w] = deltaWeightBatch[w].add(deltaWeight.scale(1.0 / batch.size()));
                     }
                 }
                 // Calculate observation's delta bias and add to mini-batch delta bias.
-                for(int b=0; b<biases.size(); b++) {
+                for (int b = 0; b < biases.size(); b++) {
                     VecN deltaBias = biasGradient[b].scale(learningRate).invert();
-                    if(deltaBiasBatch[b] == null) {
+                    if (deltaBiasBatch[b] == null) {
                         deltaBiasBatch[b] = deltaBias;
                     } else {
-                        deltaBiasBatch[b] = deltaBiasBatch[b].add(deltaBias.scale(1.0/batch.size()));
+                        deltaBiasBatch[b] = deltaBiasBatch[b].add(deltaBias.scale(1.0 / batch.size()));
                     }
                 }
             }
 
             // Update weight matrices with batch deltas.
-            for(int w=0; w<weights.size(); w++) {
+            for (int w = 0; w < weights.size(); w++) {
                 weights.set(w, weights.get(w).add(deltaWeightBatch[w]));
             }
 
             // Update bias vectors with batch deltas.
-            for(int b=0; b<biases.size(); b++) {
+            for (int b = 0; b < biases.size(); b++) {
                 biases.set(b, biases.get(b).add(deltaBiasBatch[b]));
             }
         }
@@ -200,12 +200,12 @@ public class BackPropNetwork implements Network {
         List<Observation> correct = new ArrayList<>();
         List<Observation> incorrect = new ArrayList<>();
         // Iterate across all observations in the testing set.
-        for(Observation obs: testingSet.getAllObservations()) {
+        for (Observation obs : testingSet.getAllObservations()) {
             // Get activations for the observation and classify according to the current network.
             List<VecN> activations = getActivations(obs.getAttributes());
             String classification = classify(obs.getAttributes(), activations);
             // Evaluate accuracy.
-            if(classification.equals(obs.getClassification())) {
+            if (classification.equals(obs.getClassification())) {
                 correctCount++;
                 correct.add(obs);
             } else {
@@ -213,7 +213,7 @@ public class BackPropNetwork implements Network {
             }
             // Evaluate error.
             VecN expectedOutput = getExpectedOutput(obs.getClassification());
-            VecN actualOutput = activations.get(activations.size()-1);
+            VecN actualOutput = activations.get(activations.size() - 1);
             error += getError(expectedOutput, actualOutput);
         }
         // Calculate and encapsulate final testing metadata into a result.
@@ -224,7 +224,7 @@ public class BackPropNetwork implements Network {
 
     private double getError(VecN expected, VecN actual) {
         VecN diff = expected.subtract(actual);
-        return 0.5*diff.dot(diff);
+        return 0.5 * diff.dot(diff);
     }
 
     /**
@@ -237,10 +237,10 @@ public class BackPropNetwork implements Network {
 
     // Computes class based on given activations; allows for caching of activation calculations.
     private String classify(VecN attributes, List<VecN> activations) {
-        VecN output = getActivations(attributes).get(layerSizes.size()-1);
+        VecN output = getActivations(attributes).get(layerSizes.size() - 1);
         int maxIndex = 0;
-        for(int i=1; i<classes.length; i++) {
-            if(output.get(i) > output.get(maxIndex)) {
+        for (int i = 1; i < classes.length; i++) {
+            if (output.get(i) > output.get(maxIndex)) {
                 maxIndex = i;
             }
         }
@@ -249,17 +249,18 @@ public class BackPropNetwork implements Network {
 
     /**
      * Returns the JSON representation of the current network.
+     *
      * @return the JSON representation of the network.
      */
     public String toJSON() {
         List<List<List<Double>>> weightMatrices = new ArrayList<>();
         List<List<Double>> biasVectors = new ArrayList<>();
 
-        for(MatMN weight: weights) {
+        for (MatMN weight : weights) {
             List<List<Double>> listMatrix = new ArrayList<>();
-            for(double[] col: weight.toArray()) {
+            for (double[] col : weight.toArray()) {
                 List<Double> listCol = new ArrayList<>();
-                for(double val: col) {
+                for (double val : col) {
                     listCol.add(val);
                 }
                 listMatrix.add(listCol);
@@ -267,9 +268,9 @@ public class BackPropNetwork implements Network {
             weightMatrices.add(listMatrix);
         }
 
-        for(VecN bias: biases) {
+        for (VecN bias : biases) {
             List<Double> listVector = new ArrayList<>();
-            for(double val: bias.toArray()) {
+            for (double val : bias.toArray()) {
                 listVector.add(val);
             }
             biasVectors.add(listVector);
