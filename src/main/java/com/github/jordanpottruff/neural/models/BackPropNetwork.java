@@ -5,6 +5,7 @@ import com.github.jordanpottruff.jgml.VecN;
 import com.github.jordanpottruff.neural.common.Pair;
 import com.github.jordanpottruff.neural.data.DataSet;
 import com.github.jordanpottruff.neural.data.Observation;
+import com.github.jordanpottruff.neural.initializers.Initializer;
 import org.json.simple.JSONObject;
 
 import java.util.*;
@@ -20,9 +21,9 @@ public class BackPropNetwork implements Network {
     final String[] classes;
     final List<MatMN> weights;
     final List<VecN> biases;
-    final Random rand;
     final Function<VecN, VecN> activationFunc;
     final Function<VecN, VecN> activationPrime;
+    final Initializer init;
 
     /**
      * Creates a new back propagation neural network.
@@ -33,14 +34,10 @@ public class BackPropNetwork implements Network {
      * @param classes           the classifications an observation can receive.
      * @param activationFunc    the activation function for the network.
      * @param activationPrime   the derivative of the activation function.
+     * @param init              the initializer for the network weights.
      */
-    public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, Function<VecN, VecN> activationFunc, Function<VecN, VecN> activationPrime) {
-        this(new Random(), inputSize, hiddenSizes, classes, activationFunc, activationPrime);
-    }
-
-    // Additional constructor that can be used for testing.
-    BackPropNetwork(Random rand, int inputSize, int[] hiddenSizes, String[] classes, Function<VecN, VecN> activationFunc, Function<VecN, VecN> activationPrime) {
-        this.rand = rand;
+    public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, Function<VecN, VecN> activationFunc, Function<VecN, VecN> activationPrime, Initializer init) {
+        this.init = init;
         this.layerSizes = createLayerSizes(inputSize, hiddenSizes, classes);
         this.classes = classes;
         this.weights = this.generateWeights(this.layerSizes);
@@ -63,17 +60,18 @@ public class BackPropNetwork implements Network {
         for (int i = 1; i < layerSizes.size(); i++) {
             int rows = layerSizes.get(i);
             int cols = layerSizes.get(i - 1);
-            randomWeights.add(randomMatrix(rows, cols));
+            randomWeights.add(randomMatrix(rows, cols, layerSizes.get(i-1)));
         }
         return randomWeights;
     }
 
     // Returns a single random matrix of size rows x cols.
-    private MatMN randomMatrix(int rows, int cols) {
+    private MatMN randomMatrix(int rows, int cols, int prevLayerSize) {
         double[][] values = new double[cols][rows];
         for (int c = 0; c < cols; c++) {
             for (int r = 0; r < rows; r++) {
-                values[c][r] = rand.nextGaussian();
+                values[c][r] = init.getWeight(prevLayerSize);
+
             }
         }
         return new MatMN(values);

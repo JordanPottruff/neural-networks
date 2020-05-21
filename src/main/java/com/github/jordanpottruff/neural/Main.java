@@ -1,8 +1,9 @@
 package com.github.jordanpottruff.neural;
 
-import com.github.jordanpottruff.neural.activations.Logistic;
+import com.github.jordanpottruff.neural.activations.ReLU;
 import com.github.jordanpottruff.neural.data.DataSet;
 import com.github.jordanpottruff.neural.data.Observation;
+import com.github.jordanpottruff.neural.initializers.HeInitializer;
 import com.github.jordanpottruff.neural.models.BackPropNetwork;
 
 import java.util.*;
@@ -21,18 +22,18 @@ public class Main {
         DataSet testData = testDataReader.getImageDataSet();
 
         int inputSize = 784;
-        int[] hiddenSizes = {128, 64};
+        int[] hiddenSizes = {64, 32};
         String[] classes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-        BackPropNetwork network = new BackPropNetwork(inputSize, hiddenSizes, classes, new Logistic(), new Logistic.Prime());
+        BackPropNetwork network = new BackPropNetwork(inputSize, hiddenSizes, classes, new ReLU(), new ReLU.Prime(), new HeInitializer());
 
         int n = testData.size();
-        double startLearningRate = 2.0;
-        double endLearningRate = 0.5;
+        double startLearningRate = 0.005;
+        double endLearningRate = 0.005;
         int epochs = 30;
         for (int i = 0; i < epochs; i++) {
             double learningRate = startLearningRate - ((startLearningRate - endLearningRate) / epochs) * i;
             System.out.println(learningRate);
-            network.train(trainData, 64, 2);
+            network.train(trainData, 16, learningRate);
             BackPropNetwork.Result testResult = network.test(testData);
             int numCorrect = testResult.correct().size();
             double accuracy = testResult.getAccuracy() * 100;
