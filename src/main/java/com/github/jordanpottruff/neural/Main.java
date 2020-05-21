@@ -4,7 +4,6 @@ import com.github.jordanpottruff.neural.activations.Logistic;
 import com.github.jordanpottruff.neural.data.DataSet;
 import com.github.jordanpottruff.neural.data.Observation;
 import com.github.jordanpottruff.neural.models.BackPropNetwork;
-import com.github.jordanpottruff.neural.models.Util;
 
 import java.util.*;
 
