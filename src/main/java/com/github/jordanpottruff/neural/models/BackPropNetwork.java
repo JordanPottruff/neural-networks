@@ -6,11 +6,10 @@ import com.github.jordanpottruff.neural.common.Pair;
 import com.github.jordanpottruff.neural.data.DataSet;
 import com.github.jordanpottruff.neural.data.Observation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import org.json.simple.JSONObject;
 
 /**
  * Creates basic neural networks that learn with back propagation.
@@ -256,6 +255,42 @@ public class BackPropNetwork implements Network {
         }
         return classes[maxIndex];
     }
+
+    /**
+     * Returns the JSON representation of the current network.
+     * @return the JSON representation of the network.
+     */
+    public String toJSON() {
+        List<List<List<Double>>> weightMatrices = new ArrayList<>();
+        List<List<Double>> biasVectors = new ArrayList<>();
+
+        for(MatMN weight: weights) {
+            List<List<Double>> listMatrix = new ArrayList<>();
+            for(double[] col: weight.toArray()) {
+                List<Double> listCol = new ArrayList<>();
+                for(double val: col) {
+                    listCol.add(val);
+                }
+                listMatrix.add(listCol);
+            }
+            weightMatrices.add(listMatrix);
+        }
+
+        for(VecN bias: biases) {
+            List<Double> listVector = new ArrayList<>();
+            for(double val: bias.toArray()) {
+                listVector.add(val);
+            }
+            biasVectors.add(listVector);
+        }
+
+        HashMap<Object, Object> map = new HashMap<>();
+        map.put("weights", weightMatrices);
+        map.put("biases", biasVectors);
+        JSONObject json = new JSONObject(map);
+        return json.toString();
+    }
+
 
     /**
      * Returns a string representation of the network.
