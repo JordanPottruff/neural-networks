@@ -176,9 +176,13 @@ function closePopup() {
 
 function toggleDetails() {
     if(detailsOpen) {
+        // Close more details
         document.getElementById("probabilities").style.display = "none";
+        document.getElementById("more-details").innerHTML = "More";
     } else {
+        // Open more details
         document.getElementById("probabilities").style.display = "flex";
+        document.getElementById("more-details").innerHTML = "Less";
     }
     detailsOpen = !detailsOpen;
 }
