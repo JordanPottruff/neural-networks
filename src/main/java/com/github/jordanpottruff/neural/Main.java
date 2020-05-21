@@ -1,8 +1,10 @@
 package com.github.jordanpottruff.neural;
 
+import com.github.jordanpottruff.neural.activations.Logistic;
 import com.github.jordanpottruff.neural.data.DataSet;
 import com.github.jordanpottruff.neural.data.Observation;
 import com.github.jordanpottruff.neural.models.BackPropNetwork;
+import com.github.jordanpottruff.neural.models.Util;
 
 import java.util.*;
 
@@ -22,7 +24,7 @@ public class Main {
         int inputSize = 784;
         int[] hiddenSizes = {128, 64};
         String[] classes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-        BackPropNetwork network = new BackPropNetwork(inputSize, hiddenSizes, classes);
+        BackPropNetwork network = new BackPropNetwork(inputSize, hiddenSizes, classes, new Logistic(), new Logistic.Prime());
 
         int n = testData.size();
         double startLearningRate = 2.0;

@@ -3,6 +3,7 @@ package com.github.jordanpottruff.neural.models;
 import com.github.jordanpottruff.jgml.MatMN;
 import com.github.jordanpottruff.jgml.Vec2;
 import com.github.jordanpottruff.jgml.VecN;
+import com.github.jordanpottruff.neural.activations.Logistic;
 import com.github.jordanpottruff.neural.common.Pair;
 import com.github.jordanpottruff.neural.data.DataSet;
 import com.github.jordanpottruff.neural.data.Observation;
@@ -21,8 +22,8 @@ public class BackPropNetworkTest {
 
     private static final RandomStub RAND_1 = new RandomStub(Arrays.asList(0.0, 1.0));
     private static final RandomStub RAND_2 = new RandomStub(Arrays.asList(0.0, 0.25));
-    private static final BackPropNetwork NET_1 = new BackPropNetwork(RAND_1, 2, new int[]{3}, new String[]{"A","B","C"});
-    private static final BackPropNetwork NET_2 = new BackPropNetwork(RAND_2, 2, new int[]{3}, new String[]{"A","B","C"});
+    private static final BackPropNetwork NET_1 = new BackPropNetwork(RAND_1, 2, new int[]{3}, new String[]{"A","B","C"}, new Logistic(), new Logistic.Prime());
+    private static final BackPropNetwork NET_2 = new BackPropNetwork(RAND_2, 2, new int[]{3}, new String[]{"A","B","C"}, new Logistic(), new Logistic.Prime());
 
     @Test
     public void testGenerateWeights() {
