@@ -51,6 +51,9 @@ body {
     display: block;
     margin: 50px auto;
     width: 300px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    box-shadow: 3px 3px 5px #888;
 }
 
 #popup-desc {
@@ -96,11 +99,10 @@ body {
     justify-content: center;
 }
 
-
-
 #container {
     background-color: #EAEAEA;
-    border: 2px solid #888;
+    border: 1px solid #888;
+    border-radius: 5px;
     box-shadow: 3px 3px 5px #888;
 }
 
@@ -152,4 +154,27 @@ button {
 #button-submit {
     background-color: #dafad4;
     border-color: #e6f5e4;
+}
+
+#real-time-select {
+    margin-top: 5px;
+}
+
+#real-time-checkbox {
+    float: left;
+    width: 15px;
+    height: 15px;
+}
+
+#real-time-label {
+    margin: 1px 0px 0px 3px;
+    float: left;
+    font-size: 15px;
+    line-height: 18px;
+}
+
+#right-sidebar {
+    margin-left: 20px;
+    display: none;
+    height: auto;
 }

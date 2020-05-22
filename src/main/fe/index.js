@@ -2,6 +2,7 @@
 var SIZE = 700;
 var BACKGROUND_COLOR = 250;
 var STROKE_COLOR = 230;
+var UPDATE_DELAY = 250; // Milliseconds.
 
 
 var penStrength;
@@ -12,7 +13,10 @@ var grid = new Array(28*28);
 
 var popupOpen = false;
 var detailsOpen = false;
+var realTimeOn = false;
 
+var lastGuessTime = new Date().getTime();
+var update = false;
 
 function setup() {
     penStrength = document.getElementById("in-strength").value;
@@ -37,7 +41,13 @@ function setup() {
 function draw() {
     background(250);
     drawGrid();
+    if(realTimeOn && new Date().getTime() - lastGuessTime > UPDATE_DELAY && update) {
+        updateGuess();
+        lastGuessTime = new Date().getTime();
+        update = false;
+    }
     if(mouseIsPressed && !popupOpen) {
+        update = true;
         addDrawing(mouseX, mouseY);
     }
 }
@@ -134,7 +144,7 @@ function centerGrid() {
             newGrid[shiftedI] = grid[i];
         }
     }
-    grid = newGrid;
+    return newGrid;
 }
 
 function changePenStrength(value) {
@@ -150,8 +160,14 @@ function changePenFade(value) {
 }
 
 function submit() {
-    centerGrid();
-    output = classify(grid);
+    updateGuess();
+    document.getElementById("overlay").style.display = "flex";
+
+    popupOpen = true;
+}
+
+function updateGuess() {
+    output = classify(centerGrid(grid));
     document.getElementById("popup-guess").innerHTML = getGuess(output);
     orderedOutput = orderGuesses(output);
     let table = document.getElementById("prob-table");
@@ -164,9 +180,6 @@ function submit() {
         tableRow.children[0].innerHTML = dig;
         tableRow.children[1].innerHTML = prob.toFixed(2) + "%";
     }
-    document.getElementById("overlay").style.display = "flex";
-
-    popupOpen = true;
 }
 
 function closePopup() {
@@ -178,11 +191,11 @@ function toggleDetails() {
     if(detailsOpen) {
         // Close more details
         document.getElementById("probabilities").style.display = "none";
-        document.getElementById("more-details").innerHTML = "More";
+        document.getElementById("details").innerHTML = "Show";
     } else {
         // Open more details
         document.getElementById("probabilities").style.display = "flex";
-        document.getElementById("more-details").innerHTML = "Less";
+        document.getElementById("details").innerHTML = "Hide";
     }
     detailsOpen = !detailsOpen;
 }
@@ -205,4 +218,36 @@ function orderGuesses(output) {
 
     map.sort((a, b) => (a["prob"] < b["prob"]) ? 1 : -1);
     return map;
+}
+
+function toggleRealTime() {
+    let buttonSubmit = document.getElementById('button-submit');
+    let overlay = document.getElementById('overlay');
+    let submissionPopup = document.getElementById('submission-popup');
+    let rightSidebar = document.getElementById('right-sidebar');
+    let buttonClosePopup = document.getElementById('popup-close');
+
+    if(realTimeOn) {
+        // Turn off real-time.
+        buttonSubmit.disabled = false;
+        overlay.appendChild(submissionPopup);
+        rightSidebar.style.display = "none";
+        buttonClosePopup.style.display = "inline-block";
+        // Revert details option.
+        toggleDetails();
+        toggleDetails();
+        document.getElementById("popup-more").style.display = "block";
+    } else {
+        // Turn on real-time.
+        buttonSubmit.disabled = true;
+        rightSidebar.appendChild(submissionPopup);
+        rightSidebar.style.display = "block";
+        buttonClosePopup.style.display = "none";
+        updateGuess();
+        // Show details in real-time mode.
+        document.getElementById("probabilities").style.display = "flex";
+        document.getElementById("details").innerHTML = "Hide";
+        document.getElementById("popup-more").style.display = "none";
+    }
+    realTimeOn = !realTimeOn;
 }

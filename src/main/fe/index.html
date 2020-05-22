@@ -13,7 +13,7 @@
         <div id="submission-popup">
             <p id="popup-desc">The network thinks that you drew a...</p>
             <h2 id="popup-guess"></h2>
-            <p id="popup-more" onclick="toggleDetails()"><span id="more-details">More</span> details</p>
+            <p id="popup-more" onclick="toggleDetails()"><span id="details">Show</span> details</p>
             <div id="probabilities">
                 <table id="prob-table">
                     <tr>
@@ -67,6 +67,9 @@
             </div>
         </div>
     </div>
+    <div id="left-sidebar">
+
+    </div>
     <div id="container">
         <div id="controls">
             <div class="slider-box control-box">
@@ -87,11 +90,18 @@
             <div id="buttons" class="control-box">
                 <button id="button-clear" type="button" onclick="clearGrid()">Clear</button>
                 <button id="button-submit" type="button" onclick="submit()">Submit</button>
+                <div id="real-time-select">
+                    <input type="checkbox" id="real-time-checkbox" onclick="toggleRealTime()">
+                    <p id="real-time-label">Real-time</p>
+                </div>
             </div>
         </div>
         <div id="canvas">
             <!-- Sketch goes here -->
         </div>
+    </div>
+    <div id="right-sidebar">
+
     </div>
 </body>
 </html>
