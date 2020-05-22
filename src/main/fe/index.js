@@ -108,6 +108,7 @@ function clearGrid() {
     for(let i=0; i<grid.length; i++) {
         grid[i] = 0.0;
     }
+    updateGuess();
 }
 
 function centerGrid() {
