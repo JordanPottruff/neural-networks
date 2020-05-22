@@ -32,13 +32,13 @@ public class BackPropNetwork implements Network {
     /**
      * Creates a new back propagation neural network.
      *
-     * @param inputSize      the number of nodes in the input layer.
-     * @param hiddenSizes    the number of nodes in each hidden layer. Each value corresponds to successive layer
-     *                       sizes.
-     * @param classes        the classifications an observation can receive.
-     * @param hiddenActFunc  the activation function for the hidden layers of the network.
-     * @param outputActFunc  the activation function for the output layer of the network.
-     * @param init           the initializer for the network weights.
+     * @param inputSize     the number of nodes in the input layer.
+     * @param hiddenSizes   the number of nodes in each hidden layer. Each value corresponds to successive layer
+     *                      sizes.
+     * @param classes       the classifications an observation can receive.
+     * @param hiddenActFunc the activation function for the hidden layers of the network.
+     * @param outputActFunc the activation function for the output layer of the network.
+     * @param init          the initializer for the network weights.
      */
     public BackPropNetwork(int inputSize, int[] hiddenSizes, String[] classes, ActivationFunc hiddenActFunc,
                            ActivationFunc outputActFunc, Initializer init) {
@@ -120,18 +120,19 @@ public class BackPropNetwork implements Network {
 
             // Update weights and biases.
             for (int l = 0; l < weights.size(); l++) {
-                weights.set(l, weights.get(l).add(batchWeightGradient[l].scale(- learningRate / batch.size())));
-                biases.set(l, biases.get(l).add(batchBiasGradient[l].scale(- learningRate / batch.size())));
+                weights.set(l, weights.get(l).add(batchWeightGradient[l].scale(-learningRate / batch.size())));
+                biases.set(l, biases.get(l).add(batchBiasGradient[l].scale(-learningRate / batch.size())));
             }
         }
     }
 
     /**
      * Trains the network using concurrency within a single mini-batch.
-     * @param trainingSet the data to train on.
+     *
+     * @param trainingSet   the data to train on.
      * @param miniBatchSize the size of each mini-batch.
-     * @param learningRate the learning rate.
-     * @param threads the number of threads to use.
+     * @param learningRate  the learning rate.
+     * @param threads       the number of threads to use.
      */
     public void trainConcurrent(DataSet trainingSet, int miniBatchSize, double learningRate, int threads) {
         // Shuffle training set and split into mini batches.
@@ -147,20 +148,20 @@ public class BackPropNetwork implements Network {
 
             // Create executor service.
             ExecutorService execService = Executors.newFixedThreadPool(threads);
-            for(int o = 1; o < batch.size(); o++) {
+            for (int o = 1; o < batch.size(); o++) {
                 int finalO = o;
 
                 // Execute gradient updates for the remaining observations in the batch.
                 execService.execute(() -> {
-                   Pair<MatMN[], VecN[]> gradient = calculateGradient(batch.get(finalO));
-                   for (int l = 0; l < weights.size(); l++) {
-                       synchronized(batchWeightGradient) {
-                           batchWeightGradient[l] = batchWeightGradient[l].add(gradient.getKey()[l]);
-                       }
-                       synchronized(batchBiasGradient) {
-                           batchBiasGradient[l] = batchBiasGradient[l].add(gradient.getValue()[l]);
-                       }
-                   }
+                    Pair<MatMN[], VecN[]> gradient = calculateGradient(batch.get(finalO));
+                    for (int l = 0; l < weights.size(); l++) {
+                        synchronized (batchWeightGradient) {
+                            batchWeightGradient[l] = batchWeightGradient[l].add(gradient.getKey()[l]);
+                        }
+                        synchronized (batchBiasGradient) {
+                            batchBiasGradient[l] = batchBiasGradient[l].add(gradient.getValue()[l]);
+                        }
+                    }
                 });
             }
 
@@ -175,8 +176,8 @@ public class BackPropNetwork implements Network {
 
             // Update weights and biases.
             for (int l = 0; l < weights.size(); l++) {
-                weights.set(l, weights.get(l).add(batchWeightGradient[l].scale(- learningRate / batch.size())));
-                biases.set(l, biases.get(l).add(batchBiasGradient[l].scale(- learningRate / batch.size())));
+                weights.set(l, weights.get(l).add(batchWeightGradient[l].scale(-learningRate / batch.size())));
+                biases.set(l, biases.get(l).add(batchBiasGradient[l].scale(-learningRate / batch.size())));
             }
         }
     }
