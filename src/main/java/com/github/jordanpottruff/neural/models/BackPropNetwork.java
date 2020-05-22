@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -115,6 +116,61 @@ public class BackPropNetwork implements Network {
                     batchWeightGradient[l] = batchWeightGradient[l].add(obsGradient.getKey()[l]);
                     batchBiasGradient[l] = batchBiasGradient[l].add(obsGradient.getValue()[l]);
                 }
+            }
+
+            // Update weights and biases.
+            for (int l = 0; l < weights.size(); l++) {
+                weights.set(l, weights.get(l).add(batchWeightGradient[l].scale(- learningRate / batch.size())));
+                biases.set(l, biases.get(l).add(batchBiasGradient[l].scale(- learningRate / batch.size())));
+            }
+        }
+    }
+
+    /**
+     * Trains the network using concurrency within a single mini-batch.
+     * @param trainingSet the data to train on.
+     * @param miniBatchSize the size of each mini-batch.
+     * @param learningRate the learning rate.
+     * @param threads the number of threads to use.
+     */
+    public void trainConcurrent(DataSet trainingSet, int miniBatchSize, double learningRate, int threads) {
+        // Shuffle training set and split into mini batches.
+        trainingSet.shuffle();
+        List<List<Observation>> miniBatches = Util.getMiniBatches(trainingSet, miniBatchSize);
+
+        // Perform gradient descent on each mini batch.
+        for (final List<Observation> batch : miniBatches) {
+            // Initialize the batch's gradient to be the gradient of the first observation in the batch.
+            Pair<MatMN[], VecN[]> firstGradient = calculateGradient(batch.get(0));
+            MatMN[] batchWeightGradient = firstGradient.getKey();
+            VecN[] batchBiasGradient = firstGradient.getValue();
+
+            // Create executor service.
+            ExecutorService execService = Executors.newFixedThreadPool(threads);
+            for(int o = 1; o < batch.size(); o++) {
+                int finalO = o;
+
+                // Execute gradient updates for the remaining observations in the batch.
+                execService.execute(() -> {
+                   Pair<MatMN[], VecN[]> gradient = calculateGradient(batch.get(finalO));
+                   for (int l = 0; l < weights.size(); l++) {
+                       synchronized(batchWeightGradient) {
+                           batchWeightGradient[l] = batchWeightGradient[l].add(gradient.getKey()[l]);
+                       }
+                       synchronized(batchBiasGradient) {
+                           batchBiasGradient[l] = batchBiasGradient[l].add(gradient.getValue()[l]);
+                       }
+                   }
+                });
+            }
+
+            // Stop executor service.
+            execService.shutdown();
+            try {
+                execService.awaitTermination(24, TimeUnit.HOURS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return;
             }
 
             // Update weights and biases.

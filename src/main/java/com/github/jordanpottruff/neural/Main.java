@@ -36,7 +36,11 @@ public class Main {
         for (int i = 0; i < epochs; i++) {
             double learningRate = startLearningRate - ((startLearningRate - endLearningRate) / epochs) * i;
             System.out.println(learningRate);
-            network.train(trainData, 16, learningRate);
+
+
+            network.trainConcurrent(trainData, 128, learningRate, 4);
+
+
             BackPropNetwork.Result testResult = network.test(testData);
             int numCorrect = testResult.correct().size();
             double accuracy = testResult.getAccuracy() * 100;
