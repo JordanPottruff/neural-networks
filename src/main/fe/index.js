@@ -2,6 +2,7 @@
 var SIZE = 700;
 var BACKGROUND_COLOR = 250;
 var STROKE_COLOR = 230;
+var PROB_MAX_BRIGHTNESS = 64;
 var UPDATE_DELAY = 250; // Milliseconds.
 
 
@@ -174,10 +175,12 @@ function updateGuess() {
     for(let i=0; i<orderedOutput.length; i++) {
         let dig = orderedOutput[i]["dig"];
         let prob = orderedOutput[i]["prob"] * 100;
+        let brightness = 255 - (PROB_MAX_BRIGHTNESS * (prob/100));
+        console.log(brightness);
 
-        let id = "guess" + i;
-        let tableRow = document.getElementById(id);
+        let tableRow = document.getElementById("guess" + i);
         tableRow.children[0].innerHTML = dig;
+        tableRow.style.backgroundColor = "rgb("+brightness+",255,"+brightness+")";
         tableRow.children[1].innerHTML = prob.toFixed(2) + "%";
     }
 }
