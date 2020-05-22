@@ -102,47 +102,30 @@ public class BackPropNetwork implements Network {
 
         // Perform gradient descent on each mini batch.
         for (List<Observation> batch : miniBatches) {
-            // Perform gradient descent on each observation in the mini batch.
-            MatMN[] deltaWeightBatch = new MatMN[weights.size()];
-            VecN[] deltaBiasBatch = new VecN[biases.size()];
-            for (Observation obs : batch) {
-                // Calculate gradients for the observation.
-                Pair<MatMN[], VecN[]> gradient = calculateGradient(obs);
-                MatMN[] weightGradient = gradient.getKey();
-                VecN[] biasGradient = gradient.getValue();
-                // Calculate observation's delta weight and add to mini-batch delta weight.
-                for (int w = 0; w < weights.size(); w++) {
-                    MatMN deltaWeight = weightGradient[w].scale(learningRate).invert();
-                    if (deltaWeightBatch[w] == null) {
-                        deltaWeightBatch[w] = deltaWeight;
-                    } else {
-                        deltaWeightBatch[w] = deltaWeightBatch[w].add(deltaWeight.scale(1.0 / batch.size()));
-                    }
-                }
-                // Calculate observation's delta bias and add to mini-batch delta bias.
-                for (int b = 0; b < biases.size(); b++) {
-                    VecN deltaBias = biasGradient[b].scale(learningRate).invert();
-                    if (deltaBiasBatch[b] == null) {
-                        deltaBiasBatch[b] = deltaBias;
-                    } else {
-                        deltaBiasBatch[b] = deltaBiasBatch[b].add(deltaBias.scale(1.0 / batch.size()));
-                    }
+            // Initialize the batch's gradient to be the gradient of the first observation in the batch.
+            Pair<MatMN[], VecN[]> firstGradient = calculateGradient(batch.get(0));
+            MatMN[] batchWeightGradient = firstGradient.getKey();
+            VecN[] batchBiasGradient = firstGradient.getValue();
+
+            // Add the gradients from the remaining observations in the batch.
+            for (int o = 1; o < batch.size(); o++) {
+                Pair<MatMN[], VecN[]> obsGradient = calculateGradient(batch.get(o));
+
+                for (int l = 0; l < weights.size(); l++) {
+                    batchWeightGradient[l] = batchWeightGradient[l].add(obsGradient.getKey()[l]);
+                    batchBiasGradient[l] = batchBiasGradient[l].add(obsGradient.getValue()[l]);
                 }
             }
 
-            // Update weight matrices with batch deltas.
-            for (int w = 0; w < weights.size(); w++) {
-                weights.set(w, weights.get(w).add(deltaWeightBatch[w]));
-            }
-
-            // Update bias vectors with batch deltas.
-            for (int b = 0; b < biases.size(); b++) {
-                biases.set(b, biases.get(b).add(deltaBiasBatch[b]));
+            // Update weights and biases.
+            for (int l = 0; l < weights.size(); l++) {
+                weights.set(l, weights.get(l).add(batchWeightGradient[l].scale(- learningRate / batch.size())));
+                biases.set(l, biases.get(l).add(batchBiasGradient[l].scale(- learningRate / batch.size())));
             }
         }
     }
 
-    public Pair<MatMN[], VecN[]> calculateGradient(Observation obs) {
+    Pair<MatMN[], VecN[]> calculateGradient(Observation obs) {
         List<VecN> activations = getActivations(obs.getAttributes());
         VecN expectedOutput = getExpectedOutput(obs.getClassification());
 
