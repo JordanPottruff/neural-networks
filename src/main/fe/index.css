@@ -22,7 +22,9 @@ p {
 
 body {
     margin: 0;
+    padding: 50px;
     display: flex;
+    flex-wrap: wrap;
 
     justify-content: center;
 
