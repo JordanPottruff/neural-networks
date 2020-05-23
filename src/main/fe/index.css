@@ -22,7 +22,7 @@ p {
 
 body {
     margin: 0;
-    padding: 50px;
+    padding: 25px 50px 50px 50px;
     display: flex;
     flex-wrap: wrap;
 
@@ -51,7 +51,7 @@ body {
     padding: 25px;
     background: #EEE;
     display: block;
-    margin: 50px auto;
+    margin: 25px auto;
     width: 300px;
     border: 1px solid #888;
     border-radius: 5px;
