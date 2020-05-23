@@ -1,6 +1,5 @@
 
 function classify(attributes) {
-    console.log("classify");
     weights = RELU['weights']
     biases = RELU['biases']
 
@@ -40,9 +39,6 @@ function dot(vec1, vec2) {
     let sum = 0;
     for(let i=0; i<vec1.length; i++) {
         sum += vec1[i] * vec2[i];
-        if(!isNaN(vec1[i]) && !isNaN(vec2[i]) && isNaN(sum)){
-            console.log(issue);
-        }
     }
     return sum;
 }

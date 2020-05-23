@@ -177,7 +177,6 @@ function updateGuess() {
         let dig = orderedOutput[i]["dig"];
         let prob = orderedOutput[i]["prob"] * 100;
         let brightness = 255 - (PROB_MAX_BRIGHTNESS * (prob/100));
-        console.log(brightness);
 
         let tableRow = document.getElementById("guess" + i);
         tableRow.children[0].innerHTML = dig;
